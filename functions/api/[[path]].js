@@ -3,7 +3,7 @@ const J=(o,s=200,h={})=>new Response(JSON.stringify(o),{status:s,headers:{"conte
 const E=new TextEncoder(),hex=a=>[...new Uint8Array(a)].map(x=>x.toString(16).padStart(2,"0")).join(""),rnd=n=>hex(crypto.getRandomValues(new Uint8Array(n)));
 const sha=async t=>hex(await crypto.subtle.digest("SHA-256",E.encode(t)));
 const pbk=async(pw,salt)=>{const k=await crypto.subtle.importKey("raw",E.encode(pw),"PBKDF2",false,["deriveBits"]);return hex(await crypto.subtle.deriveBits({name:"PBKDF2",hash:"SHA-256",salt:E.encode(salt),iterations:100000},k,256))};
-const KEYS=["ca_ent","ca_par","ca_siren","ca_done","ca_pt","ca_ia","ca_nom"],DAY=2592000,RX=/(?:^|; )ca_s=([a-f0-9]{64})/;
+const KEYS=["ca_ent","ca_par","ca_siren","ca_done","ca_pt","ca_ia","ca_nom","ca_xl"],DAY=2592000,RX=/(?:^|; )ca_s=([a-f0-9]{64})/;
 const ck=(t,age)=>"ca_s="+t+"; HttpOnly; Secure; SameSite=Lax; Path=/; Max-Age="+age;
 const eq=(a,b)=>{if(a.length!==b.length)return false;let d=0;for(let i=0;i<a.length;i++)d|=a.charCodeAt(i)^b.charCodeAt(i);return d===0};
 const lim=async f=>{try{return await f()}catch(e){return null}};
@@ -13,6 +13,7 @@ const all=async(db,id)=>{const r=await db.prepare("SELECT k,v FROM user_data WHE
 export async function onRequest(c){
 const u=new URL(c.request.url),p=u.pathname.replace(/^\/api\/?/,"").replace(/\/$/,""),m=c.request.method,db=c.env.DB;
 if(!db)return J({err:"Le service est momentanément indisponible. Réessayez dans quelques instants."},503);
+if(p==="config"&&m==="GET")return J({google:c.env.GOOGLE_CLIENT_ID||null});
 if(p.startsWith("verify/")&&m==="GET")return verify(c,decodeURIComponent(p.slice(7)).toUpperCase());
 const o=c.request.headers.get("origin");
 if(m!=="GET"&&o&&new URL(o).host!==u.host)return J({err:"Requête refusée."},403);
@@ -25,6 +26,16 @@ if(b.accord!==true)return J({err:"L’accord de confidentialité doit être acce
 if(await db.prepare("SELECT id FROM users WHERE email=?1").bind(email).first())return J({err:"Un compte existe déjà avec cette adresse."},409);
 const salt=rnd(16),accord=new Date().toISOString(),r=await db.prepare("INSERT INTO users(email,nom,pw_hash,salt,accord,created) VALUES(?1,?2,?3,?4,?5,?6)").bind(email,nom,await pbk(pw,salt),salt,accord,Date.now()).run();
 return J({user:{nom,email,accord,admin:isAdmin(c.env,email)}},200,{"set-cookie":await start(db,r.meta.last_row_id)})}
+if(p==="auth/google"&&m==="POST"){
+const cid=c.env.GOOGLE_CLIENT_ID;if(!cid)return J({err:"Connexion Google non configurée."},503);
+const b=await c.request.json().catch(()=>({}));if(typeof b.credential!=="string"||b.credential.length>4096)return J({err:"Requête invalide."},400);
+const r0=await fetch("https://oauth2.googleapis.com/tokeninfo?id_token="+encodeURIComponent(b.credential)).catch(()=>null);
+const g=r0&&r0.ok?await r0.json().catch(()=>null):null;
+if(!g||g.aud!==cid||!(g.iss==="accounts.google.com"||g.iss==="https://accounts.google.com")||String(g.email_verified)!=="true"||+g.exp*1000<Date.now()||!g.email)return J({err:"Connexion Google refusée."},401);
+const email=String(g.email).trim().toLowerCase();let r=await db.prepare("SELECT * FROM users WHERE email=?1").bind(email).first();
+if(!r){const nom=String(g.given_name||g.name||email.split("@")[0]).trim().slice(0,40)||"Utilisateur",ac=new Date().toISOString();await db.prepare("INSERT INTO users(email,nom,pw_hash,salt,accord,created) VALUES(?1,?2,?3,'google',?4,?5)").bind(email,nom,rnd(32),ac,Date.now()).run();r=await db.prepare("SELECT * FROM users WHERE email=?1").bind(email).first()}
+else if(r.salt!=="google"){await db.prepare("UPDATE users SET pw_hash=?2,salt='google' WHERE id=?1").bind(r.id,rnd(32)).run();await db.prepare("DELETE FROM sessions WHERE user_id=?1").bind(r.id).run()}
+return J({user:{nom:r.nom,email:r.email,accord:r.accord,admin:isAdmin(c.env,r.email)}},200,{"set-cookie":await start(db,r.id)})}
 if(p==="auth/login"&&m==="POST"){
 const b=await c.request.json(),email=String(b.email||"").trim().toLowerCase(),now=Date.now();
 let a=await lim(()=>db.prepare("SELECT n,until FROM attempts WHERE email=?1").bind(email).first());
