@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Vérification · Compt’Aide</title>
+<style>*{box-sizing:border-box}body{margin:0;background:#F4F2EB;color:#2B3445;font:16px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}main{max-width:520px;margin:0 auto;padding:28px 16px}h1{font:600 26px/1.2 Georgia,"Times New Roman",serif;color:#12345A;margin:0 0 6px}p{margin:0 0 14px}.mu{color:#6B7280;font-size:14px}.c{background:#FFFEFA;border:1px solid #DDD8CA;border-radius:8px;padding:16px;margin-top:16px}input{width:100%;min-height:46px;border:1px solid #DDD8CA;border-radius:6px;padding:8px 12px;font:inherit;background:#fff;text-transform:uppercase}button{margin-top:10px;min-height:46px;border:0;border-radius:6px;background:#12345A;color:#fff;font:600 16px system-ui;padding:0 18px;cursor:pointer}.r{display:flex;justify-content:space-between;gap:10px;padding:6px 0;border-bottom:1px solid #E7E2D4}.r:last-child{border:0}.ok{color:#0F7F6A;font-weight:700}.ko{color:#B91C1C;font-weight:700}.n{font-size:13px;color:#6B7280;border-left:3px solid #12345A;padding-left:10px;margin-top:18px}</style></head>
+<body><main><h1>Vérification d’un document</h1><p class="mu">Registre en ligne des attestations et certificats délivrés par Compt’Aide.</p>
+<div class="c"><label for="n" class="mu">Numéro du document</label><input id="n" placeholder="CA-CRT-2026-XXXXXXXX" autocomplete="off"><button id="b">Vérifier</button></div>
+<div class="c" id="o" hidden></div>
+<p class="n">Les documents Compt’Aide sont des documents privés, sans équivalence avec un diplôme d’État. Seuls le numéro, le type, le prénom et l’initiale du nom, la date et le statut sont publics (plus la note finale d’un certificat).</p></main>
+<script>
+var n=document.getElementById("n"),o=document.getElementById("o");
+function row(a,b,c){return '<div class="r"><span>'+a+'</span><b'+(c?' class="'+c+'"':'')+'>'+b+'</b></div>'}
+function esc(t){return String(t).replace(/[&<>"]/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]})}
+function go(){var v=n.value.trim().toUpperCase();if(!v)return;o.hidden=false;o.textContent="Vérification…";
+fetch("/api/verify/"+encodeURIComponent(v)).then(function(r){return r.json()}).then(function(j){
+if(!j.ok){o.innerHTML=row("Résultat","Introuvable","ko")+'<p class="mu" style="margin:10px 0 0">'+esc(j.err||"")+'</p>';return}
+var ok=j.statut==="valide";
+o.innerHTML=row("Résultat",ok?"Document authentique":"Document révoqué",ok?"ok":"ko")+row("Numéro",esc(j.num))+row("Type",j.type==="ATT"?"Attestation de parcours":"Certificat de réussite")+row("Titulaire",esc(j.titulaire))+row("Délivré le",new Date(j.issued).toLocaleDateString("fr-FR"))+(j.final!=null?row("Note finale",j.final+" / 100"):"")}).catch(function(){o.textContent="Service momentanément indisponible."})}
+document.getElementById("b").onclick=go;n.onkeydown=function(e){if(e.key==="Enter")go()};
+var q=new URLSearchParams(location.search).get("n");if(q){n.value=q;go()}
+</script></body></html>
