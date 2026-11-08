@@ -2,8 +2,9 @@ const J=(o,s=200,h={})=>new Response(JSON.stringify(o),{status:s,headers:{"conte
 const E=new TextEncoder(),hex=a=>[...new Uint8Array(a)].map(x=>x.toString(16).padStart(2,"0")).join(""),rnd=n=>hex(crypto.getRandomValues(new Uint8Array(n)));
 const sha=async t=>hex(await crypto.subtle.digest("SHA-256",E.encode(t)));
 const pbk=async(pw,salt)=>{const k=await crypto.subtle.importKey("raw",E.encode(pw),"PBKDF2",false,["deriveBits"]);return hex(await crypto.subtle.deriveBits({name:"PBKDF2",hash:"SHA-256",salt:E.encode(salt),iterations:100000},k,256))};
-const KEYS=["ca_ent","ca_par","ca_siren","ca_done","ca_pt"],DAY=2592000,RX=/(?:^|; )ca_s=([a-f0-9]{64})/;
+const KEYS=["ca_ent","ca_par","ca_siren","ca_done","ca_pt","ca_ia"],DAY=2592000,RX=/(?:^|; )ca_s=([a-f0-9]{64})/;
 const ck=(t,age)=>"ca_s="+t+"; HttpOnly; Secure; SameSite=Lax; Path=/; Max-Age="+age;
+const eq=(a,b)=>{if(a.length!==b.length)return false;let d=0;for(let i=0;i<a.length;i++)d|=a.charCodeAt(i)^b.charCodeAt(i);return d===0};
 const lim=async f=>{try{return await f()}catch(e){return null}};
 async function start(db,uid){await lim(()=>db.prepare("DELETE FROM sessions WHERE expires<?1").bind(Date.now()).run());const t=rnd(32);await db.prepare("INSERT INTO sessions(token_hash,user_id,expires) VALUES(?1,?2,?3)").bind(await sha(t),uid,Date.now()+DAY*1000).run();return ck(t,DAY)}
 async function who(c){const m=RX.exec(c.request.headers.get("cookie")||"");if(!m)return null;return await c.env.DB.prepare("SELECT u.id,u.nom,u.email,u.accord FROM sessions s JOIN users u ON u.id=s.user_id WHERE s.token_hash=?1 AND s.expires>?2").bind(await sha(m[1]),Date.now()).first()}
@@ -28,16 +29,20 @@ let a=await lim(()=>db.prepare("SELECT n,until FROM attempts WHERE email=?1").bi
 if(a&&a.until&&a.until<=now){await lim(()=>db.prepare("DELETE FROM attempts WHERE email=?1").bind(email).run());a=null}
 if(a&&a.until>now)return J({err:"Trop de tentatives. Réessayez dans quelques minutes."},429);
 const r=await db.prepare("SELECT * FROM users WHERE email=?1").bind(email).first();
-if(!r||await pbk(String(b.password||""),r.salt)!==r.pw_hash){await lim(()=>db.prepare("INSERT INTO attempts(email,n,until) VALUES(?1,1,0) ON CONFLICT(email) DO UPDATE SET n=n+1,until=CASE WHEN n+1>=5 THEN ?2 ELSE 0 END").bind(email,now+900000).run());return J({err:"Adresse e-mail ou mot de passe incorrect."},401)}
+const hh=await pbk(String(b.password||"").slice(0,200),r?r.salt:"0".repeat(32));if(!r||!eq(hh,r.pw_hash)){await lim(()=>db.prepare("INSERT INTO attempts(email,n,until) VALUES(?1,1,0) ON CONFLICT(email) DO UPDATE SET n=n+1,until=CASE WHEN n+1>=5 THEN ?2 ELSE 0 END").bind(email,now+900000).run());return J({err:"Adresse e-mail ou mot de passe incorrect."},401)}
 await lim(()=>db.prepare("DELETE FROM attempts WHERE email=?1").bind(email).run());
 return J({user:{nom:r.nom,email:r.email,accord:r.accord}},200,{"set-cookie":await start(db,r.id)})}
 if(p==="auth/logout"&&m==="POST"){const x=RX.exec(c.request.headers.get("cookie")||"");if(x)await db.prepare("DELETE FROM sessions WHERE token_hash=?1").bind(await sha(x[1])).run();return J({ok:true},200,{"set-cookie":ck("",0)})}
 const me=await who(c);
 if(p==="me"&&m==="GET")return me?J({user:{nom:me.nom,email:me.email,accord:me.accord}}):J({err:"Non connecté."},401);
 if(!me)return J({err:"Non connecté."},401);
-if(p==="assistant"&&m==="POST"){const b=await c.request.json(),q=String(b.q||"").slice(0,500);if(!c.env.AI||!q)return J({err:"Indisponible."},503);const r=await lim(()=>c.env.AI.run("@cf/meta/llama-3.1-8b-instruct",{messages:[{role:"system",content:"Tu es un formateur en comptabilité française. Réponds en français, de façon claire et courte, avec un exemple d’écriture (numéros de comptes du plan comptable général) quand c’est utile. Si la question sort de la comptabilité, de la TVA ou de la fiscalité française, dis-le poliment."},{role:"user",content:q}],max_tokens:400}));const t=r&&String(r.response||"").trim();return t?J({r:t}):J({err:"Indisponible."},503)}
+if(p==="assistant"&&m==="POST"){const b=await c.request.json(),q=String(b.q||"").trim().slice(0,500);if(!c.env.AI||!q)return J({err:"Indisponible."},503);
+const dy=Math.floor(Date.now()/864e5),us=await lim(()=>db.prepare("INSERT INTO ai_usage(user_id,day,n) VALUES(?1,?2,1) ON CONFLICT(user_id,day) DO UPDATE SET n=n+1 RETURNING n").bind(me.id,dy).first());
+if(us&&us.n>40)return J({err:"Limite de 40 questions par jour atteinte. Revenez demain ou consultez les leçons et le glossaire."},429);
+const hs=(Array.isArray(b.h)?b.h:[]).slice(-6).filter(x=>x&&(x.role==="user"||x.role==="assistant")&&typeof x.content==="string").map(x=>({role:x.role,content:x.content.slice(0,600)}));
+const r=await lim(()=>c.env.AI.run("@cf/meta/llama-3.1-8b-instruct",{messages:[{role:"system",content:"Tu es un formateur en comptabilité française, pédagogue et précis. Réponds en français, en 6 phrases maximum. Quand c’est utile, donne l’écriture avec les numéros de comptes du plan comptable général et indique débit ou crédit. N’invente jamais un numéro de compte ni un taux : en cas de doute, dis-le. Pour les taux et seuils fiscaux, rappelle de vérifier sur impots.gouv.fr. Si la question sort de la comptabilité, de la finance d’entreprise, de la banque ou de la fiscalité française, dis-le poliment."}].concat(hs,[{role:"user",content:q}]),max_tokens:450}));const t=r&&String(r.response||"").trim();return t?J({r:t}):J({err:"Indisponible."},503)}
 if(p==="data"&&m==="GET")return J({data:await all(db,me.id)});
 if(p==="data"&&m==="PUT"){const b=await c.request.json(),v=JSON.stringify(b.value);if(!KEYS.includes(b.key)||v.length>500000)return J({err:"Donnée refusée."},400);await db.prepare("INSERT INTO user_data(user_id,k,v,updated) VALUES(?1,?2,?3,?4) ON CONFLICT(user_id,k) DO UPDATE SET v=excluded.v,updated=excluded.updated").bind(me.id,b.key,v,Date.now()).run();return J({ok:true})}
 if(p==="export"&&m==="GET")return J({compte:{nom:me.nom,email:me.email,accord:me.accord},donnees:await all(db,me.id)});
-if(p==="account"&&m==="DELETE"){await db.batch([db.prepare("DELETE FROM user_data WHERE user_id=?1").bind(me.id),db.prepare("DELETE FROM sessions WHERE user_id=?1").bind(me.id),db.prepare("DELETE FROM users WHERE id=?1").bind(me.id)]);return J({ok:true},200,{"set-cookie":ck("",0)})}
+if(p==="account"&&m==="DELETE"){await lim(()=>db.prepare("DELETE FROM ai_usage WHERE user_id=?1").bind(me.id).run());await db.batch([db.prepare("DELETE FROM user_data WHERE user_id=?1").bind(me.id),db.prepare("DELETE FROM sessions WHERE user_id=?1").bind(me.id),db.prepare("DELETE FROM users WHERE id=?1").bind(me.id)]);return J({ok:true},200,{"set-cookie":ck("",0)})}
 return J({err:"Introuvable."},404)}catch(e){return J({err:"Le service est momentanément indisponible. Réessayez dans quelques instants."},500)}}
