@@ -3,7 +3,7 @@ const PdfLoad=u=>new Promise((ok,ko)=>{const s=document.createElement("script");
 async function certPdf(c,origin){
 if(!window.jspdf)await PdfLoad("https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js");
 if(!window.qrcode)await PdfLoad("https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js");
-const {jsPDF}=window.jspdf,d=new jsPDF({orientation:"landscape",unit:"mm",format:"a4"}),W=297,H=210,N=[12,40,95],BL=[8,102,255],cl=t=>String(t).replace(/’/g,"'"),att=c.type==="ATT";
+const {jsPDF}=window.jspdf,d=new jsPDF({orientation:"landscape",unit:"mm",format:"a4"}),W=297,H=210,N=[12,40,95],BL=[18,52,90],cl=t=>String(t).replace(/’/g,"'"),att=c.type==="ATT";
 const url=origin+"/verifier.html?n="+c.num;
 d.setFillColor(...BL);d.rect(0,0,W,22,"F");d.setTextColor(255,255,255);d.setFont("helvetica","bold");d.setFontSize(15);d.text("COMPT'AIDE",W/2,14,{align:"center",charSpace:3});
 d.setDrawColor(...BL);d.setLineWidth(.6);d.rect(8,28,W-16,H-36);d.setLineWidth(.2);d.rect(10.5,30.5,W-21,H-41);
