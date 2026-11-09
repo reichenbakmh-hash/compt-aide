@@ -133,6 +133,13 @@ main{max-width:780px;padding:20px 16px 40px}
 </head>
 <body>
 <div id="root"></div>
+<script>
+window.caRepair=function(){var a=navigator.serviceWorker?navigator.serviceWorker.getRegistrations().then(function(r){return Promise.all(r.map(function(x){return x.unregister()}))}):Promise.resolve();a.then(function(){return window.caches?caches.keys().then(function(k){return Promise.all(k.map(function(x){return caches.delete(x)}))}):0}).then(function(){location.reload()},function(){location.reload()})};
+window.caFail=function(m){var r=document.getElementById("root");if(!r||r.getAttribute("data-ok"))return;r.innerHTML='<div style="max-width:420px;margin:60px auto;padding:20px;font:16px/1.5 system-ui,sans-serif;color:#1C1E21"><b style="font-size:20px">Compt’Aide ne démarre pas</b><p>Une ancienne version est peut-être restée en mémoire. Touchez le bouton pour la nettoyer : vos données ne sont pas effacées.</p><button onclick="caRepair()" style="min-height:46px;padding:0 20px;border:0;border-radius:8px;background:#0866FF;color:#fff;font:600 16px system-ui">Réparer et relancer</button><p style="font-size:12px;color:#65676B;word-break:break-word">'+String(m||"").replace(/[<>&]/g,"")+'</p></div>'};
+addEventListener("error",function(e){setTimeout(function(){caFail(e&&e.message)},300)});
+setTimeout(function(){caFail("Démarrage trop long")},6000);
+</script>
+
 <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.3.1/umd/react.production.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.3.1/umd/react-dom.production.min.js"></script>
 <script src="/certif.js"></script>
@@ -466,7 +473,7 @@ const pull=async()=>{const r=await api("data");if(r.j&&r.j.data)Object.keys(r.j.
 function GBtn({ok,open}){
 const [id,setId]=useState(null),[er,setEr]=useState("");
 useEffect(()=>{api("config").then(r=>{if(r.ok&&r.j&&r.j.google)setId(r.j.google)}).catch(()=>{})},[]);
-useEffect(()=>{if(!id)return;const init=()=>{const el=document.getElementById("gbtn");if(!el||!window.google)return;google.accounts.id.initialize({client_id:id,callback:async x=>{setEr("");try{const r=await api("auth/google","POST",{credential:x.credential});if(r.ok&&r.j&&r.j.user){clr();await pull();ok(r.j.user)}else setEr((r.j&&r.j.err)||"Connexion Google impossible.")}catch(e){setEr("Connexion Google impossible.")}}});google.accounts.id.renderButton(el,{theme:"outline",size:"large",shape:"pill",text:"continue_with",locale:"fr",width:Math.min(320,el.offsetWidth||320)})};
+useEffect(()=>{if(!id)return;const init=()=>{try{const el=document.getElementById("gbtn");if(!el||!window.google)return;google.accounts.id.initialize({client_id:id,callback:async x=>{setEr("");try{const r=await api("auth/google","POST",{credential:x.credential});if(r.ok&&r.j&&r.j.user){clr();await pull();ok(r.j.user)}else setEr((r.j&&r.j.err)||"Connexion Google impossible.")}catch(e){setEr("Connexion Google impossible.")}}});google.accounts.id.renderButton(el,{theme:"outline",size:"large",shape:"pill",text:"continue_with",locale:"fr",width:Math.min(320,Math.max(200,el.offsetWidth||320))})}catch(e){}};
 if(window.google&&window.google.accounts)init();else{const s=document.createElement("script");s.src="https://accounts.google.com/gsi/client";s.async=true;s.onload=init;document.head.appendChild(s)}},[id]);
 if(!id)return null;
 return h("div",{style:{marginBottom:14}},h("div",{id:"gbtn",style:{display:"flex",justifyContent:"center",minHeight:44}}),h("p",{className:"mu sm",style:{textAlign:"center",margin:"8px 0 0"}},"En continuant avec Google, vous acceptez l’",h("a",{href:"#",onClick:e=>{e.preventDefault();open()},style:{textDecoration:"underline",color:"var(--acx)"}},"accord de confidentialité"),"."),er&&h("p",{className:"sm",style:{color:"var(--er)",textAlign:"center"}},er),h("div",{className:"mu sm",style:{textAlign:"center",margin:"12px 0 0"}},"ou avec une adresse e-mail"))}
@@ -503,7 +510,8 @@ return h("div",null,h(Card,{t:"Rapprochement bancaire"},h("p",{style:{marginTop:
 h("div",{className:"res"},h("div",null,h("span",{className:"mu sm"},"Solde 512"),h("b",null,eur(cpt))),h("div",null,h("span",{className:"mu sm"},"Solde pointé"),h("b",null,eur(pnt))),h("div",null,h("span",{className:"mu sm"},"Écart"),h("b",{style:{color:rl&&ec!==0?"var(--er)":"var(--acx)"}},rl?eur(ec):"-"))),
 rl&&h("p",{className:"sm",style:{marginBottom:0}},ec===0?"Rapprochement réussi.":"Il reste "+eur(Math.abs(ec))+" à expliquer : opération du relevé non comptabilisée (frais, agios, virement) ou mouvement à pointer.")),
 h("div",{style:{height:12}}),h(Card,{t:"Mouvements du compte 512"},L.length?L.map(x=>h("label",{className:"li",key:x[0],style:{alignItems:"center",cursor:"pointer"}},h("input",{type:"checkbox",checked:!!pt[x[0]],onChange:()=>tg(x[0]),style:{width:18,height:18}}),h("div",{style:{flex:1}},x[2],h("div",{className:"mu sm"},x[1].split("-").reverse().join("/"))),h("b",null,eur(x[3])))):"Aucun mouvement bancaire : passez des écritures sur le compte 512."));}
-ReactDOM.createRoot(document.getElementById("root")).render(h(App));
+class EB extends React.Component{constructor(p){super(p);this.state={e:null}}static getDerivedStateFromError(e){return{e:e}}render(){if(!this.state.e)return this.props.children;return h("div",{style:{maxWidth:420,margin:"60px auto",padding:20}},h("b",{style:{fontSize:20}},"Une erreur est survenue"),h("p",null,"Touchez le bouton pour nettoyer l’ancienne version en mémoire. Vos données ne sont pas effacées."),h("button",{className:"btn",onClick:()=>window.caRepair()},"Réparer et relancer"),h("p",{className:"mu sm",style:{wordBreak:"break-word"}},String(this.state.e&&this.state.e.message||this.state.e)))}}
+document.getElementById("root").setAttribute("data-ok","1");ReactDOM.createRoot(document.getElementById("root")).render(h(EB,null,h(App)));
 </script>
 <script>if("serviceWorker" in navigator&&location.protocol==="https:")addEventListener("load",function(){navigator.serviceWorker.register("/sw.js").catch(function(){})})</script>
 </body>
