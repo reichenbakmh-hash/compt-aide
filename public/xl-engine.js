@@ -1,4 +1,4 @@
-/* Moteur de formules adapté de « excel-teacher » (c) 2026 Matthew Green, licence MIT : voir THIRD_PARTY_NOTICES.md */
+/* Moteur de formules adapté de « excel-teacher » (c) 2026 Matthew Green, licence MIT : voir THIRD_PARTY_NOTICES.md ; fonctions ajoutées pour Compt'Aide */
 (function(){
 /**
  * A small, Excel-flavoured formula parser + evaluator.
@@ -752,7 +752,10 @@ function evaluate(node, ctx) {
       for (let r = r1; r <= r2; r++) {
         for (let c = c1; c <= c2; c++) values.push(ctx.getCellValue(r, c))
       }
-      return makeRange(values)
+      const rg = makeRange(values)
+      rg.rows = r2 - r1 + 1
+      rg.cols = c2 - c1 + 1
+      return rg
     }
 
     case 'unary': {
@@ -798,6 +801,21 @@ function evaluate(node, ctx) {
       // IF is lazy in Excel, but with no side effects eager evaluation is
       // indistinguishable — except that errors in the untaken branch would
       // leak. So evaluate branches lazily for IF only.
+      if (node.name === 'IFERROR') {
+        if (node.args.length !== 2) fail(ERRORS.VALUE)
+        try {
+          const v = scalar(evaluate(node.args[0], ctx))
+          if (isError(v)) fail(v)
+          return v
+        } catch (e) {
+          if (e instanceof FormulaError || (e && e.__circular)) {
+            const w = scalar(evaluate(node.args[1], ctx))
+            if (isError(w)) fail(w)
+            return w
+          }
+          throw e
+        }
+      }
       if (node.name === 'IF') {
         const test = evaluate(node.args[0], ctx)
         if (isError(test)) fail(test)
@@ -996,5 +1014,61 @@ function getActiveSignature(input, caret = input.length) {
   return null
 }
 
-window.XL={computeSheet:computeSheet,toRef:toRef,displayValue:displayValue,FUNCTION_NAMES:FUNCTION_NAMES};
+/* ---- Fonctions ajoutées pour Compt'Aide ---- */
+const need2d = (r) => { if (!isRange(r)) fail(ERRORS.VALUE); if (!r.cols) { r.cols = 1; r.rows = r.values.length } return r }
+const at = (r, i, j) => r.values[i * r.cols + j]
+const same = (a, b) => (typeof a === 'number' && typeof b === 'number') ? a === b : String(a ?? '').trim().toUpperCase() === String(b ?? '').trim().toUpperCase()
+const leq = (v, k) => (typeof v === 'number' && typeof k === 'number') ? v <= k : String(v ?? '').toUpperCase() <= String(k ?? '').toUpperCase()
+const pairs = (args, from) => { const out = []; for (let i = from; i + 1 < args.length; i += 2) out.push([need2d(args[i]).values, scalar(args[i + 1])]); return out }
+const rowsOk = (ps, n) => { const idx = []; for (let i = 0; i < n; i++) if (ps.every(([vals, c]) => matchesCriterion(vals[i], c))) idx.push(i); return idx }
+const nums = (a) => numbersFrom([a])
+const dparse = (v) => { const s = String(v ?? '').trim(); let m = /^(\d{1,2})\/(\d{1,2})\/(\d{4})$/.exec(s); if (m) return { d: +m[1], m: +m[2], y: +m[3] }; m = /^(\d{4})-(\d{1,2})-(\d{1,2})$/.exec(s); if (m) return { d: +m[3], m: +m[2], y: +m[1] }; return fail(ERRORS.VALUE) }
+Object.assign(FUNCTIONS, {
+  IFERROR: { signature: 'IFERROR(valeur, si_erreur)', hint: 'Remplace une erreur par une valeur.', fn: (a) => scalar(a[0]) },
+  VLOOKUP: { signature: 'VLOOKUP(clé, tableau, colonne, [FAUX])', hint: 'Cherche dans la première colonne.', fn: (a) => {
+    arity(a, 3, 4); const r = need2d(a[1]), k = scalar(a[0]), c = toNumber(scalar(a[2]))
+    if (c < 1 || c > r.cols) fail(ERRORS.REF)
+    if (a.length > 3 && !toBool(scalar(a[3]))) { for (let i = 0; i < r.rows; i++) if (same(at(r, i, 0), k)) return at(r, i, c - 1); fail(ERRORS.NA) }
+    let b = -1; for (let i = 0; i < r.rows; i++) { if (leq(at(r, i, 0), k)) b = i; else break }
+    if (b < 0) fail(ERRORS.NA); return at(r, b, c - 1) } },
+  XLOOKUP: { signature: 'XLOOKUP(clé, colonne_clés, colonne_résultat, [si_absent])', hint: 'Recherche moderne.', fn: (a) => {
+    arity(a, 3, 4); const k = scalar(a[0]), L = need2d(a[1]).values, R = need2d(a[2]).values
+    for (let i = 0; i < L.length; i++) if (same(L[i], k)) return R[i]
+    if (a.length > 3) return scalar(a[3]); return fail(ERRORS.NA) } },
+  MATCH: { signature: 'MATCH(clé, plage, [type])', hint: 'Position d’une valeur.', fn: (a) => {
+    arity(a, 2, 3); const k = scalar(a[0]), L = need2d(a[1]).values, t = a.length > 2 ? toNumber(scalar(a[2])) : 1
+    if (t === 0) { for (let i = 0; i < L.length; i++) if (same(L[i], k)) return i + 1; return fail(ERRORS.NA) }
+    let b = -1; for (let i = 0; i < L.length; i++) { if (leq(L[i], k)) b = i; else break }
+    if (b < 0) fail(ERRORS.NA); return b + 1 } },
+  INDEX: { signature: 'INDEX(plage, ligne, [colonne])', hint: 'Valeur à une position.', fn: (a) => {
+    arity(a, 2, 3); const r = need2d(a[0]), i = toNumber(scalar(a[1])), j = a.length > 2 ? toNumber(scalar(a[2])) : 1
+    if (r.rows === 1 && a.length === 2) { if (i < 1 || i > r.cols) fail(ERRORS.REF); return r.values[i - 1] }
+    if (i < 1 || i > r.rows || j < 1 || j > r.cols) fail(ERRORS.REF); return at(r, i - 1, j - 1) } },
+  SUMIFS: { signature: 'SUMIFS(somme, plage1, crit1, …)', hint: 'Somme selon plusieurs critères.', fn: (a) => {
+    arity(a, 3); const S = need2d(a[0]).values, idx = rowsOk(pairs(a, 1), S.length); return idx.reduce((t, i) => { const n = Number(S[i]); return t + (Number.isFinite(n) && S[i] !== '' ? n : 0) }, 0) } },
+  COUNTIFS: { signature: 'COUNTIFS(plage1, crit1, …)', hint: 'Compte selon plusieurs critères.', fn: (a) => {
+    arity(a, 2); const ps = pairs(a, 0); return rowsOk(ps, ps[0][0].length).length } },
+  AVERAGEIF: { signature: 'AVERAGEIF(plage, critère, [moyenne])', hint: 'Moyenne conditionnelle.', fn: (a) => {
+    arity(a, 2, 3); const R = need2d(a[0]).values, V = a.length > 2 ? need2d(a[2]).values : R, c = scalar(a[1])
+    const x = []; R.forEach((v, i) => { if (matchesCriterion(v, c) && V[i] !== '' && !Number.isNaN(Number(V[i]))) x.push(Number(V[i])) })
+    if (!x.length) fail(ERRORS.DIV0); return x.reduce((t, y) => t + y, 0) / x.length } },
+  LEFT: { signature: 'LEFT(texte, [n])', hint: 'Premiers caractères.', fn: (a) => { arity(a, 1, 2); return toText(scalar(a[0])).slice(0, a.length > 1 ? toNumber(scalar(a[1])) : 1) } },
+  RIGHT: { signature: 'RIGHT(texte, [n])', hint: 'Derniers caractères.', fn: (a) => { arity(a, 1, 2); const t = toText(scalar(a[0])), n = a.length > 1 ? toNumber(scalar(a[1])) : 1; return n <= 0 ? '' : t.slice(-n) } },
+  MID: { signature: 'MID(texte, début, longueur)', hint: 'Extrait du texte.', fn: (a) => { arity(a, 3, 3); const s = toNumber(scalar(a[1])); if (s < 1) fail(ERRORS.VALUE); return toText(scalar(a[0])).substr(s - 1, toNumber(scalar(a[2]))) } },
+  TRIM: { signature: 'TRIM(texte)', hint: 'Retire les espaces en trop.', fn: (a) => { arity(a, 1, 1); return toText(scalar(a[0])).trim().replace(/\s+/g, ' ') } },
+  PROPER: { signature: 'PROPER(texte)', hint: 'Majuscule à chaque mot.', fn: (a) => { arity(a, 1, 1); return toText(scalar(a[0])).toLowerCase().replace(/(^|[^a-zà-ÿ])([a-zà-ÿ])/g, (m, p, c) => p + c.toUpperCase()) } },
+  CONCAT: { signature: 'CONCAT(texte1, …)', hint: 'Assemble des textes.', fn: (a) => { arity(a, 1); return flatten(a).map((v) => toText(v)).join('') } },
+  RANK: { signature: 'RANK(nombre, plage, [ordre])', hint: 'Rang dans une série.', fn: (a) => { arity(a, 2, 3); const n = toNumber(scalar(a[0])), L = nums(a[1]), asc = a.length > 2 && toNumber(scalar(a[2])) !== 0; if (!L.includes(n)) fail(ERRORS.NA); return L.filter((x) => asc ? x < n : x > n).length + 1 } },
+  LARGE: { signature: 'LARGE(plage, k)', hint: 'k-ième plus grande valeur.', fn: (a) => { arity(a, 2, 2); const L = nums(a[0]).sort((x, y) => y - x), k = toNumber(scalar(a[1])); if (k < 1 || k > L.length) fail(ERRORS.NUM); return L[k - 1] } },
+  SMALL: { signature: 'SMALL(plage, k)', hint: 'k-ième plus petite valeur.', fn: (a) => { arity(a, 2, 2); const L = nums(a[0]).sort((x, y) => x - y), k = toNumber(scalar(a[1])); if (k < 1 || k > L.length) fail(ERRORS.NUM); return L[k - 1] } },
+  MEDIAN: { signature: 'MEDIAN(plage)', hint: 'Valeur médiane.', fn: (a) => { arity(a, 1); const L = numbersFrom(a).sort((x, y) => x - y); if (!L.length) fail(ERRORS.NUM); const m = L.length >> 1; return L.length % 2 ? L[m] : (L[m - 1] + L[m]) / 2 } },
+  COUNTBLANK: { signature: 'COUNTBLANK(plage)', hint: 'Cellules vides.', fn: (a) => { arity(a, 1, 1); return flatten(a).filter((v) => v === '' || v === null || v === undefined).length } },
+  YEAR: { signature: 'YEAR(date)', hint: 'Année d’une date jj/mm/aaaa.', fn: (a) => { arity(a, 1, 1); return dparse(scalar(a[0])).y } },
+  MONTH: { signature: 'MONTH(date)', hint: 'Mois d’une date.', fn: (a) => { arity(a, 1, 1); return dparse(scalar(a[0])).m } },
+  DAY: { signature: 'DAY(date)', hint: 'Jour d’une date.', fn: (a) => { arity(a, 1, 1); return dparse(scalar(a[0])).d } },
+  PMT: { signature: 'PMT(taux, durée, capital)', hint: 'Mensualité d’un prêt (négative).', fn: (a) => { arity(a, 3, 3); const r = toNumber(scalar(a[0])), n = toNumber(scalar(a[1])), pv = toNumber(scalar(a[2])); if (n === 0) fail(ERRORS.NUM); return r === 0 ? -pv / n : -pv * r / (1 - Math.pow(1 + r, -n)) } },
+  NPV: { signature: 'NPV(taux, flux1, …)', hint: 'Valeur actuelle nette.', fn: (a) => { arity(a, 2); const r = toNumber(scalar(a[0])); return numbersFrom(a.slice(1)).reduce((t, v, i) => t + v / Math.pow(1 + r, i + 1), 0) } },
+})
+
+window.XL={computeSheet:computeSheet,toRef:toRef,displayValue:displayValue};
 })();

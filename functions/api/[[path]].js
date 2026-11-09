@@ -58,5 +58,10 @@ if(p.startsWith("cert/")||p.startsWith("admin/"))return certRoute(c,p,m,me);
 if(p==="data"&&m==="GET")return J({data:await all(db,me.id)});
 if(p==="data"&&m==="PUT"){const b=await c.request.json(),v=JSON.stringify(b.value);if(!KEYS.includes(b.key)||v.length>500000)return J({err:"Donnée refusée."},400);await db.prepare("INSERT INTO user_data(user_id,k,v,updated) VALUES(?1,?2,?3,?4) ON CONFLICT(user_id,k) DO UPDATE SET v=excluded.v,updated=excluded.updated").bind(me.id,b.key,v,Date.now()).run();return J({ok:true})}
 if(p==="export"&&m==="GET")return J({compte:{nom:me.nom,email:me.email,accord:me.accord},donnees:await all(db,me.id),certification:await ensure(db,me.id).catch(()=>null)});
+if(p==="account/password"&&m==="POST"){const b=await c.request.json().catch(()=>({})),u=await db.prepare("SELECT salt,pw_hash FROM users WHERE id=?1").bind(me.id).first();
+if(!u||u.salt==="google")return J({err:"Ce compte utilise Google : il n’a pas de mot de passe."},400);
+const nw=String(b.pw||"");if(nw.length<8||nw.length>200)return J({err:"8 caractères minimum."},400);
+const oh=await pbk(String(b.old||"").slice(0,200),u.salt);if(!eq(oh,u.pw_hash))return J({err:"Mot de passe actuel incorrect."},403);
+const salt=rnd(16);await db.prepare("UPDATE users SET pw_hash=?2,salt=?3 WHERE id=?1").bind(me.id,await pbk(nw,salt),salt).run();return J({ok:true})}
 if(p==="account"&&m==="DELETE"){await lim(()=>db.prepare("DELETE FROM ai_usage WHERE user_id=?1").bind(me.id).run());await lim(()=>db.prepare("DELETE FROM certs WHERE user_id=?1").bind(me.id).run());await lim(()=>db.prepare("DELETE FROM exam_attempts WHERE user_id=?1").bind(me.id).run());await db.batch([db.prepare("DELETE FROM user_data WHERE user_id=?1").bind(me.id),db.prepare("DELETE FROM sessions WHERE user_id=?1").bind(me.id),db.prepare("DELETE FROM users WHERE id=?1").bind(me.id)]);return J({ok:true},200,{"set-cookie":ck("",0)})}
 return J({err:"Introuvable."},404)}catch(e){return J({err:"Le service est momentanément indisponible. Réessayez dans quelques instants."},500)}}
