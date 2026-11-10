@@ -1066,6 +1066,7 @@ Object.assign(FUNCTIONS, {
   YEAR: { signature: 'YEAR(date)', hint: 'Année d’une date jj/mm/aaaa.', fn: (a) => { arity(a, 1, 1); return dparse(scalar(a[0])).y } },
   MONTH: { signature: 'MONTH(date)', hint: 'Mois d’une date.', fn: (a) => { arity(a, 1, 1); return dparse(scalar(a[0])).m } },
   DAY: { signature: 'DAY(date)', hint: 'Jour d’une date.', fn: (a) => { arity(a, 1, 1); return dparse(scalar(a[0])).d } },
+  TODAY: { signature: 'TODAY()', hint: 'Date du jour.', fn: (a) => { arity(a, 0, 0); const d = new Date(); return String(d.getDate()).padStart(2, '0') + '/' + String(d.getMonth() + 1).padStart(2, '0') + '/' + d.getFullYear() } },
   PMT: { signature: 'PMT(taux, durée, capital)', hint: 'Mensualité d’un prêt (négative).', fn: (a) => { arity(a, 3, 3); const r = toNumber(scalar(a[0])), n = toNumber(scalar(a[1])), pv = toNumber(scalar(a[2])); if (n === 0) fail(ERRORS.NUM); return r === 0 ? -pv / n : -pv * r / (1 - Math.pow(1 + r, -n)) } },
   NPV: { signature: 'NPV(taux, flux1, …)', hint: 'Valeur actuelle nette.', fn: (a) => { arity(a, 2); const r = toNumber(scalar(a[0])); return numbersFrom(a.slice(1)).reduce((t, v, i) => t + v / Math.pow(1 + r, i + 1), 0) } },
 })
