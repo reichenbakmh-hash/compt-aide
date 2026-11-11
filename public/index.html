@@ -153,6 +153,36 @@ main{max-width:780px;padding:20px 16px 40px}
 .dty{display:inline-flex;gap:4px;padding:6px 0}.dty i{width:7px;height:7px;border-radius:50%;background:var(--mu);animation:dty 1s infinite}.dty i:nth-child(2){animation-delay:.15s}.dty i:nth-child(3){animation-delay:.3s}
 @keyframes dty{0%,60%,100%{opacity:.25}30%{opacity:1}}
 @media(min-width:900px){.dc{left:300px;bottom:0}}
+.ldr{display:flex;justify-content:center;padding:34px 0 8px}
+.cupl{width:100px;height:80px;position:relative;display:flex;justify-items:center;align-items:center}
+.cupl .cup{position:absolute;width:25px;height:18px;background-color:#fff;border:1px solid var(--hd);z-index:1;border-radius:2px 2px 10px 10px;animation:cupx 6s infinite ease-in-out;transform-origin:center}
+.cupl .cup::after{content:"";position:absolute;top:-2px;width:calc(100% - 2px);height:2px;background:#fed59fca;border:1px solid var(--hd);border-radius:50%}
+.cupl .cup::before{content:"";position:absolute;top:15px;width:calc(100% - 2px);height:4px;background:#ffffff00;border:1px solid var(--hd);border-top:none;border-radius:50%;z-index:-1}
+.cupl .cup .cup-handle{position:absolute;width:5px;height:10px;background-color:#fff;border:1px solid var(--hd);right:-5px;top:2px;border-radius:2px 10px 20px 2px}
+.cupl .cup .smoke{position:absolute;bottom:100%;left:50%;width:15px;height:25px;background:rgba(107,102,102,.433);border-radius:50%;transform:translateX(-50%);animation:cupr 6s infinite ease-in-out;filter:blur(8px)}
+.cupl .cup .smoke.two{animation-delay:1s}.cupl .cup .smoke.three{animation-delay:2s}
+.cupl .load{position:absolute;font-size:10px;opacity:.7;top:45%;left:50%;transform:translateX(-50%);z-index:-1;color:var(--tx)}
+@keyframes cupx{0%{width:25px;transform:translateX(0)}40%{width:100%;transform:translateX(0)}80%{width:25px;transform:translateX(64px)}90%{width:100%;transform:translateX(0)}100%{width:25px;transform:translateX(0)}}
+@keyframes cupr{0%{transform:translate(-50%,0) scale(.4);opacity:0}30%{opacity:.7}60%{opacity:.4}100%{transform:translate(-50%,-120px) scale(1);opacity:0}}
+.gen-ovl{position:fixed;inset:0;z-index:80;background:rgba(7,16,29,.9);display:flex;align-items:center;justify-content:center}
+.genl{position:relative;display:flex;align-items:center;justify-content:center;height:120px;width:auto;margin:2rem;font-family:"Poppins",system-ui,sans-serif;font-size:1.6em;font-weight:600;user-select:none;color:#fff;scale:2}
+.genl-mask{position:absolute;top:0;left:0;height:100%;width:100%;z-index:1;background-color:transparent;-webkit-mask:repeating-linear-gradient(90deg,transparent 0,transparent 6px,black 7px,black 8px);mask:repeating-linear-gradient(90deg,transparent 0,transparent 6px,black 7px,black 8px)}
+.genl-mask::after{content:"";position:absolute;top:0;left:0;width:100%;height:100%;background-image:radial-gradient(circle at 50% 50%,#ff0 0%,transparent 50%),radial-gradient(circle at 45% 45%,#f00 0%,transparent 45%),radial-gradient(circle at 55% 55%,#0ff 0%,transparent 45%),radial-gradient(circle at 45% 55%,#0f0 0%,transparent 45%),radial-gradient(circle at 55% 45%,#00f 0%,transparent 45%);-webkit-mask:radial-gradient(circle at 50% 50%,transparent 0%,transparent 10%,black 25%);mask:radial-gradient(circle at 50% 50%,transparent 0%,transparent 10%,black 25%);animation:gen-tr 2s infinite alternate,gen-op 4s infinite;animation-timing-function:cubic-bezier(.6,.8,.5,1)}
+@keyframes gen-tr{0%{transform:translate(-55%)}100%{transform:translate(55%)}}
+@keyframes gen-op{0%,100%{opacity:0}15%{opacity:1}65%{opacity:0}}
+.genl-l{display:inline-block;opacity:0;animation:gen-letter 4s infinite linear;z-index:2}
+.genl-l:nth-child(1){animation-delay:.1s}.genl-l:nth-child(2){animation-delay:.205s}.genl-l:nth-child(3){animation-delay:.31s}.genl-l:nth-child(4){animation-delay:.415s}.genl-l:nth-child(5){animation-delay:.521s}.genl-l:nth-child(6){animation-delay:.626s}.genl-l:nth-child(7){animation-delay:.731s}.genl-l:nth-child(8){animation-delay:.837s}.genl-l:nth-child(9){animation-delay:.942s}.genl-l:nth-child(10){animation-delay:1.047s}
+@keyframes gen-letter{0%{opacity:0}5%{opacity:1;text-shadow:0 0 4px #fff;transform:scale(1.1) translateY(-2px)}20%{opacity:.2}100%{opacity:0}}
+@media(max-width:420px){.genl{scale:1.6}}
+.lf{display:flex;flex-direction:column;gap:6px;background:var(--card);padding:28px 22px;border-radius:20px;box-shadow:0 2px 14px rgba(0,0,0,.09)}
+.flb{color:var(--hd);font-weight:600;display:block;margin-bottom:6px}
+.inf{border:1.5px solid var(--bd);border-radius:10px;height:50px;display:flex;align-items:center;padding-left:12px;gap:10px;transition:.2s ease-in-out;color:var(--mu);background:var(--card)}
+.inf:focus-within{border-color:var(--ac)}
+.inf input{flex:1;min-width:0;height:100%;border:0;outline:0;background:none;color:var(--tx);font:inherit;font-size:16px;border-radius:10px}
+.sbm{margin:16px 0 8px;background:var(--hd);color:var(--card);border:0;border-radius:10px;height:50px;width:100%;font-weight:600;font-size:16px;cursor:pointer}.sbm:disabled{opacity:.45;cursor:default}
+.lfp{text-align:center;font-size:14px;margin:6px 0;color:var(--tx)}
+.lfs{color:var(--acx);font:inherit;font-weight:600;cursor:pointer;background:none;border:0;padding:0 4px}
+.lfd{display:flex;align-items:center;gap:10px;color:var(--mu);font-size:14px;margin:10px 0}.lfd::before,.lfd::after{content:"";flex:1;height:1px;background:var(--bd)}
 @media print{aside,.bnav,.sheet,.top,.fbtop,.chips{display:none!important}main{padding:0;max-width:none}}
 </style>
 </head>
@@ -336,8 +366,12 @@ const [open,setOpen]=useState(null);
 return h("div",null,h(Head,{t:"Cas professionnels",s:done.length+" cas sur "+CAS.length+" réussis"}),
 CAS.map(c=>{const d=done.includes(c.id),o=open===c.id;return h("section",{className:"card pc",key:c.id},h("div",{className:"ph"},h("div",null,h("b",{style:{color:"var(--hd)"}},c.t),h("div",{className:"mu sm"},c.lv)),d&&h("span",{className:"badge ok"},"Réussi")),h("p",{style:{margin:"0 0 10px"}},c.e),o&&h(Lines,{l:c.c}),h("div",{className:"chips",style:{margin:"10px 0 0"}},h("button",{className:"btn ghost",onClick:()=>setOpen(o?null:c.id)},o?"Masquer la correction":"Voir la correction"),h("button",{className:"btn",onClick:()=>toggle(c.id)},d?"Retirer la réussite":"Marquer réussi")))}));}
 const SRV={on:false},SY=["ca_ent","ca_par","ca_siren","ca_done","ca_pt","ca_ia","ca_nom","ca_xl"],tm={};
-const api=(p,m,b)=>fetch("/api/"+p,{method:m||"GET",credentials:"same-origin",headers:b?{"content-type":"application/json"}:{},body:b?JSON.stringify(b):undefined}).then(async r=>{let j=null;try{j=await r.json()}catch(e){}return{ok:r.ok,s:r.status,j}});
-const LS={g(k,d){try{const v=JSON.parse(localStorage.getItem(k));return v==null?d:v}catch(e){return d}},s(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}if(SRV.on&&SY.includes(k)){clearTimeout(tm[k]);tm[k]=setTimeout(()=>api("data","PUT",{key:k,value:v}).catch(()=>{}),600)}}};
+const api=(p,m,b)=>fetch("/api/"+p,{method:m||"GET",credentials:"same-origin",headers:b?{"content-type":"application/json"}:{},body:b?JSON.stringify(b):undefined,signal:AbortSignal.timeout?AbortSignal.timeout(15000):undefined}).then(async r=>{let j=null;try{j=await r.json()}catch(e){}return{ok:r.ok,s:r.status,j}}).catch(()=>({ok:false,s:0,j:null,off:true}));
+const LS={g(k,d){try{const v=JSON.parse(localStorage.getItem(k));return v==null?d:v}catch(e){return d}},s(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}if(SRV.on&&SY.includes(k)){dirty(k,1);clearTimeout(tm[k]);tm[k]=setTimeout(()=>push(k),600)}}};
+const DK=()=>{try{const a=JSON.parse(localStorage.getItem("ca_dirty"));return Array.isArray(a)?a:[]}catch(e){return[]}};
+const dirty=(k,on)=>{const a=DK().filter(x=>x!==k);if(on)a.push(k);try{localStorage.setItem("ca_dirty",JSON.stringify(a))}catch(e){}};
+const push=async k=>{const r=await api("data","PUT",{key:k,value:LS.g(k,null)});if(r.ok||(r.s>=400&&r.s<500&&![401,408,429].includes(r.s)))dirty(k,0);return r.ok};
+let flushing=false;const flush=async()=>{if(!SRV.on||flushing||!DK().length)return;flushing=true;try{for(const k of DK()){if(!(await push(k)))break}}finally{flushing=false}};
 const r2=x=>Math.round(x*100)/100,n2=v=>r2(parseFloat(String(v).replace(/\s/g,"").replace(",","."))||0);
 const JN={AC:"Achats",VT:"Ventes",BQ:"Banque",OD:"Opérations diverses"};
 const dstr=d=>d.replace(/-/g,""),fm=x=>(x||0).toFixed(2).replace(".",",");
@@ -396,6 +430,8 @@ h(Card,{t:"Méthode en 3 étapes"},h("p",{style:{margin:0}},"1. Facturez ou sais
 h("div",{style:{height:12}}),
 h(Chips,{o:[["f","Facturer"],["s","Saisir"],["b","Balance"],["g","Grand livre"],["j","Journal"],["p","Bilan"],["a","Amortissement"],["r","Banque"],["t","TVA"],["c","Contrôles"],["x","Export FEC"]],v:t,set:setT}),
 h("div",{className:"chips"},h("button",{className:"btn ghost",onClick:ex},"Charger un exemple"),h("button",{className:"btn ghost",disabled:!E.length,onClick:()=>t==="b"?csv([["Compte","Libellé","Débit","Crédit","Solde"]].concat(K.map(k=>[k,lab(k)||"",fm(B[k][0]),fm(B[k][1]),fm(r2(B[k][0]-B[k][1]))])),"balance.csv"):csv([["Date","Journal","Pièce","Compte","Libellé du compte","Libellé","Débit","Crédit"]].concat(S.flatMap(e=>e.l.map(x=>[e.d,JN[e.j],e.id,x[0],lab(x[0])||"",e.lib,fm(x[1]),fm(x[2])]))),"journal.csv")},"Exporter vers Excel"),h("button",{className:"btn ghost",onClick:()=>window.print()},"Imprimer"),h("button",{className:"btn ghost",disabled:!E.length,onClick:()=>save([])},"Tout effacer"),h("span",{className:"mu sm"},E.length+" écriture(s)")),V[t]);}
+const Loader=()=>h("div",{className:"ldr",role:"status","aria-label":"Chargement"},h("div",{className:"cupl"},h("div",{className:"cup"},h("div",{className:"cup-handle"}),h("div",{className:"smoke one"}),h("div",{className:"smoke two"}),h("div",{className:"smoke three"})),h("div",{className:"load"},"..........................")));
+const GenLoader=()=>h("div",{className:"gen-ovl",role:"status","aria-label":"Génération du document"},h("div",{className:"genl"},"Génération".split("").map((c,i)=>h("span",{key:i,className:"genl-l"},c)),h("div",{className:"genl-mask"})));
 const Tile=({n,go})=>h("button",{className:"tile",onClick:()=>go(n.id)},h("span",{className:"ic",style:{background:TC[n.c]+"22",color:TC[n.c]}},h(Icon,{n:n.i,s:20})),h("b",null,n.t),n.d&&h("span",{className:"d"},n.d));
 const Hub=({g,t,go})=>h("div",null,h(Head,{t,s:""}),h("div",{className:"tiles"},NAV.filter(n=>n.g===g).map(n=>h(Tile,{key:n.id,n,go}))));
 const Row=({c,i,t,sub,onClick})=>h("button",{className:"mrow",onClick},h("span",{className:"ic",style:{background:c+"22",color:c}},h(Icon,{n:i,s:18})),h("span",null,h("b",null,t),sub&&h("div",{className:"mu sm",style:{fontWeight:400}},sub)));
@@ -460,7 +496,7 @@ h("div",{className:"grid kpis"},h(Kpi,{l:"Écritures",v:String(E.length),s:"Atel
 h("div",{className:"grid two"},h(Card,{t:"Prochaine étape"},nx?h("div",null,h("p",{style:{marginTop:0}},nx[0]),h("button",{className:"btn",onClick:()=>go(nx[1])},"Ouvrir"),h("button",{className:"btn ghost",style:{marginLeft:8},onClick:()=>go("par")},"Voir le parcours")):h("p",{style:{margin:0}},"Parcours terminé. Passez l’évaluation finale pour obtenir votre certificat.")),
 h(Card,{t:"Progression par niveau"},PAR.map((st,i)=>h(Prog,{key:i,l:st.t,v:st.s.filter((q,j)=>P[i+"-"+j]).length/st.s.length*100})))),
 h("div",{className:"grid two"},h(Card,{t:"Apprendre Excel"},h(Prog,{l:"Leçons réussies",v:xd/XL_LES.length*100}),h("button",{className:"btn",onClick:()=>go("xl")},"Continuer")),
-h(Card,{t:"Certification"},h(Prog,{l:"Parcours validé",v:ok/tot*100}),h("button",{className:"btn",onClick:()=>go("cert")},"Ouvrir"))),
+h(Card,{t:"Certification"},h(Prog,{l:"Formation validée",v:ok/tot*100}),h("button",{className:"btn",onClick:()=>go("cert")},"Ouvrir"))),
 h(Card,{t:"Astuce du jour"},h("p",{style:{margin:0}},tip)),
 h("div",{style:{height:12}}),
 h(Card,{t:"Accès rapide"},h("div",{className:"chips",style:{marginBottom:0}},[["pro","Atelier pratique"],["compta","Leçons"],["pcg","Plan comptable"],["cas","Cas professionnels"],["xl","Excel"],["cert","Certification"],["jar","Jargon"],["ia","Compt’AI"]].map(x=>h("button",{key:x[0],className:"chip",onClick:()=>go(x[0])},x[1])))))}
@@ -512,37 +548,48 @@ h("p",{className:"mu sm"},"Première année calculée au prorata temporis sur "+
 h("div",{className:"sc"},h("table",{className:"tb"},h("thead",null,h("tr",null,["Exercice","Dotation","Cumul","Valeur nette"].map((c,i)=>h("th",{key:c,className:i?"n":""},c)))),h("tbody",null,R.map((x,i)=>{cu=r2(cu+x);return h("tr",{key:i},h("td",null,y+i),h("td",{className:"n"},eur(x)),h("td",{className:"n"},eur(cu)),h("td",{className:"n"},eur(r2(V-cu))))})))),
 h("div",{style:{marginTop:12}},h("button",{className:"btn",disabled:!V||!a1,onClick:()=>{add({j:"OD",d:y+"-12-31",lib:"Dotation aux amortissements "+T[t][2],l:[["681",a1,0],[T[t][1],0,a1]]});setOk(true)}},"Passer la dotation de la première année"),ok&&h("span",{className:"badge ok",style:{marginLeft:10}},"Écriture enregistrée")));}
 const csv=(rows,n)=>{try{const t=rows.map(r=>r.map(v=>'"'+String(v).replace(/"/g,'""')+'"').join(";")).join("\r\n");const a=document.createElement("a");a.href=URL.createObjectURL(new Blob(["\ufeff"+t],{type:"text/csv;charset=utf-8"}));a.download=n;a.click()}catch(e){}};
-const clr=()=>{SY.forEach(k=>{try{localStorage.removeItem(k)}catch(e){}})};
-const pull=async()=>{const r=await api("data");if(r.j&&r.j.data)Object.keys(r.j.data).forEach(k=>{try{localStorage.setItem(k,JSON.stringify(r.j.data[k]))}catch(e){}})};
+const clr=()=>{SY.concat("ca_dirty").forEach(k=>{try{localStorage.removeItem(k)}catch(e){}})};
+const pull=async()=>{const r=await api("data");if(r.j&&r.j.data){const d=DK();Object.keys(r.j.data).forEach(k=>{if(d.includes(k))return;try{localStorage.setItem(k,JSON.stringify(r.j.data[k]))}catch(e){}})}};
 function GBtn({ok,open}){
 const [id,setId]=useState(null),[er,setEr]=useState("");
 useEffect(()=>{api("config").then(r=>{if(r.ok&&r.j&&r.j.google)setId(r.j.google)}).catch(()=>{})},[]);
-useEffect(()=>{if(!id)return;const init=()=>{try{const el=document.getElementById("gbtn");if(!el||!window.google)return;google.accounts.id.initialize({client_id:id,callback:async x=>{setEr("");try{const r=await api("auth/google","POST",{credential:x.credential});if(r.ok&&r.j&&r.j.user){clr();await pull();ok(r.j.user)}else setEr((r.j&&r.j.err)||"Connexion Google impossible.")}catch(e){setEr("Connexion Google impossible.")}}});google.accounts.id.renderButton(el,{theme:"outline",size:"large",shape:"pill",text:"continue_with",locale:"fr",width:Math.min(320,Math.max(200,el.offsetWidth||320))})}catch(e){}};
+useEffect(()=>{if(!id)return;const init=()=>{try{const el=document.getElementById("gbtn");if(!el||!window.google)return;google.accounts.id.initialize({client_id:id,callback:async x=>{setEr("");try{const r=await api("auth/google","POST",{credential:x.credential});if(r.ok&&r.j&&r.j.user){clr();await pull();ok(r.j.user)}else setEr((r.j&&r.j.err)||"Connexion Google impossible.")}catch(e){setEr("Connexion Google impossible.")}}});google.accounts.id.renderButton(el,{theme:"outline",size:"large",shape:"pill",text:"continue_with",locale:"fr",width:Math.min(400,Math.max(200,el.offsetWidth||320))})}catch(e){}};
 if(window.google&&window.google.accounts)init();else{const s=document.createElement("script");s.src="https://accounts.google.com/gsi/client";s.async=true;s.onload=init;document.head.appendChild(s)}},[id]);
 if(!id)return null;
-return h("div",{style:{marginBottom:14}},h("div",{id:"gbtn",style:{display:"flex",justifyContent:"center",minHeight:44}}),h("p",{className:"mu sm",style:{textAlign:"center",margin:"8px 0 0"}},"En continuant avec Google, vous acceptez l’",h("a",{href:"#",onClick:e=>{e.preventDefault();open()},style:{textDecoration:"underline",color:"var(--acx)"}},"accord de confidentialité"),"."),er&&h("p",{className:"sm",style:{color:"var(--er)",textAlign:"center"}},er),h("div",{className:"mu sm",style:{textAlign:"center",margin:"12px 0 0"}},"ou avec une adresse e-mail"))}
+return h("div",null,h("div",{className:"lfd"},"Ou avec"),h("div",{id:"gbtn",style:{display:"flex",justifyContent:"center",minHeight:44}}),h("p",{className:"mu sm",style:{textAlign:"center",margin:"8px 0 0"}},"En continuant avec Google, vous acceptez l’",h("a",{href:"#",onClick:e=>{e.preventDefault();open()},style:{textDecoration:"underline",color:"var(--acx)"}},"accord de confidentialité"),"."),er&&h("p",{className:"sm",style:{color:"var(--er)",textAlign:"center"}},er))}
+const IcMail=()=>h("svg",{width:20,height:20,viewBox:"0 0 32 32",fill:"currentColor","aria-hidden":true},h("path",{d:"m30.853 13.87a15 15 0 0 0 -29.729 4.082 15.1 15.1 0 0 0 12.876 12.918 15.6 15.6 0 0 0 2.016.13 14.85 14.85 0 0 0 7.715-2.145 1 1 0 1 0 -1.031-1.711 13.007 13.007 0 1 1 5.458-6.529 2.149 2.149 0 0 1 -4.158-.759v-10.856a1 1 0 0 0 -2 0v1.726a8 8 0 1 0 .2 10.325 4.135 4.135 0 0 0 7.83.274 15.2 15.2 0 0 0 .823-7.455zm-14.853 8.13a6 6 0 1 1 6-6 6.006 6.006 0 0 1 -6 6z"}));
+const IcLock=()=>h("svg",{width:20,height:20,viewBox:"-64 0 512 512",fill:"currentColor","aria-hidden":true},h("path",{d:"m336 512h-288c-26.453125 0-48-21.523438-48-48v-224c0-26.476562 21.546875-48 48-48h288c26.453125 0 48 21.523438 48 48v224c0 26.476562-21.546875 48-48 48zm-288-288c-8.8125 0-16 7.167969-16 16v224c0 8.832031 7.1875 16 16 16h288c8.8125 0 16-7.167969 16-16v-224c0-8.832031-7.1875-16-16-16zm0 0"}),h("path",{d:"m304 224c-8.832031 0-16-7.167969-16-16v-80c0-52.929688-43.070312-96-96-96s-96 43.070312-96 96v80c0 8.832031-7.167969 16-16 16s-16-7.167969-16-16v-80c0-70.59375 57.40625-128 128-128s128 57.40625 128 128v80c0 8.832031-7.167969 16-16 16zm0 0"}));
+const IcUser=()=>h("svg",{width:20,height:20,viewBox:"0 0 24 24",fill:"none",stroke:"currentColor",strokeWidth:1.8,strokeLinecap:"round","aria-hidden":true},h("circle",{cx:12,cy:8,r:4}),h("path",{d:"M4 21a8 8 0 0116 0"}));
+const Fld=(lb,ic,inp)=>h("div",{style:{marginBottom:12}},h("label",{className:"flb"},lb),h("div",{className:"inf"},ic,inp));
 function Inscr({ok,srv}){
 const [nom,setNom]=useState(""),[em,setEm]=useState(""),[pw,setPw]=useState(""),[ac,setAc]=useState(false),[pg,setPg]=useState(false),[md,setMd]=useState("new"),[er,setEr]=useState(""),[bz,setBz]=useState(false);
 const nw=md==="new",valid=/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(em.trim())&&(!srv||pw.length>=8)&&(!nw||(nom.trim().length>1&&ac));
 const go=async()=>{setBz(true);setEr("");const user={nom:nom.trim(),email:em.trim(),accord:new Date().toISOString()};if(!srv){ok(user);return}
-try{const r=await api(nw?"auth/register":"auth/login","POST",{nom:nom.trim(),email:em.trim(),password:pw,accord:ac});if(r.ok&&r.j&&r.j.user){clr();await pull();ok(r.j.user)}else setEr((r.j&&r.j.err)||"Une erreur est survenue. Réessayez.")}catch(e){setEr("Le service est momentanément indisponible. Réessayez dans quelques instants.")}setBz(false)};
+try{const r=await api(nw?"auth/register":"auth/login","POST",{nom:nom.trim(),email:em.trim(),password:pw,accord:ac});if(r.ok&&r.j&&r.j.user){clr();await pull();ok(r.j.user)}else setEr((r.j&&r.j.err)||(r.off?(navigator.onLine===false?"Vous êtes hors ligne. La première connexion demande internet.":"Le service est momentanément indisponible. Réessayez dans quelques instants."):"Une erreur est survenue. Réessayez."))}catch(e){setEr("Le service est momentanément indisponible. Réessayez dans quelques instants.")}setBz(false)};
 if(pg)return h("div",{style:{maxWidth:640,margin:"0 auto",padding:"28px 16px"}},h("button",{className:"btn ghost",onClick:()=>{setPg(false);window.scrollTo(0,0)}},"Retour"),h("h1",{style:{marginTop:16}},"Accord de confidentialité"),h(Card,null,h(Pol)),h("div",{style:{marginTop:12}},h("button",{className:"btn",onClick:()=>{setAc(true);setPg(false);window.scrollTo(0,0)}},"J’ai lu et j’accepte")));
-return h("div",{style:{maxWidth:520,margin:"0 auto",padding:"28px 16px"}},h(Logo,{s:44}),h(Inst),h("h1",{style:{marginTop:16}},nw?"Créer mon accès":"Connexion"),h("p",{className:"sub"},nw?"Quelques informations pour enregistrer votre progression et vos écritures.":"Retrouvez votre travail."),
-h(Card,null,srv&&h(GBtn,{ok,open:()=>{setPg(true);window.scrollTo(0,0)}}),nw&&h("div",null,h("label",{className:"lbl"},"Prénom"),h("input",{className:"inp",value:nom,onChange:e=>setNom(e.target.value),autoComplete:"given-name"})),h("label",{className:"lbl"},"Adresse e-mail"),h("input",{className:"inp",type:"email",value:em,onChange:e=>setEm(e.target.value),autoComplete:"email"}),
-srv&&h("div",null,h("label",{className:"lbl"},"Mot de passe (8 caractères minimum)"),h("input",{className:"inp",type:"password",value:pw,onChange:e=>setPw(e.target.value),autoComplete:nw?"new-password":"current-password"})),
-nw&&h("label",{style:{display:"flex",gap:10,alignItems:"flex-start",margin:"8px 0 12px",cursor:"pointer"}},h("input",{type:"checkbox",checked:ac,onChange:e=>setAc(e.target.checked),style:{marginTop:4,width:18,height:18}}),h("span",null,"J’ai lu et j’accepte l’",h("a",{href:"#confidentialite",onClick:e=>{e.preventDefault();setPg(true);window.scrollTo(0,0)},style:{textDecoration:"underline",color:"var(--acx)"}},"accord de confidentialité"),".")),
-er&&h("p",{className:"sm",style:{color:"var(--er)"}},er),
-h("div",{className:"chips",style:{marginBottom:0}},h("button",{className:"btn",disabled:!valid||bz,onClick:go},nw?"Créer mon accès":"Se connecter"),srv&&h("button",{className:"btn ghost",onClick:()=>{setMd(nw?"in":"new");setEr("")}},nw?"J’ai déjà un compte":"Créer un compte"))));}
+return h("div",{style:{maxWidth:460,margin:"0 auto",padding:"28px 16px"}},h("div",{style:{display:"flex",justifyContent:"center",marginBottom:8}},h(Logo,{s:44})),h(Inst),
+h("div",{className:"lf"},h("h1",{style:{margin:"0 0 14px",textAlign:"center"}},nw?"Créer mon accès":"Connexion"),
+nw&&Fld("Prénom",h(IcUser),h("input",{value:nom,onChange:e=>setNom(e.target.value),autoComplete:"given-name",placeholder:"Votre prénom"})),
+Fld("Adresse e-mail",h(IcMail),h("input",{type:"email",value:em,onChange:e=>setEm(e.target.value),autoComplete:"email",placeholder:"nom@exemple.fr"})),
+srv&&Fld(nw?"Mot de passe (8 caractères minimum)":"Mot de passe",h(IcLock),h("input",{type:"password",value:pw,onChange:e=>setPw(e.target.value),autoComplete:nw?"new-password":"current-password",placeholder:"Votre mot de passe"})),
+nw&&h("label",{style:{display:"flex",gap:10,alignItems:"flex-start",margin:"4px 0 0",cursor:"pointer",fontSize:14}},h("input",{type:"checkbox",checked:ac,onChange:e=>setAc(e.target.checked),style:{marginTop:3,width:18,height:18}}),h("span",null,"J’ai lu et j’accepte l’",h("a",{href:"#confidentialite",onClick:e=>{e.preventDefault();setPg(true);window.scrollTo(0,0)},style:{textDecoration:"underline",color:"var(--acx)"}},"accord de confidentialité"),".")),
+er&&h("p",{className:"sm",style:{color:"var(--er)",margin:"8px 0 0"}},er),
+h("button",{className:"sbm",disabled:!valid||bz,onClick:go},bz?"Un instant…":nw?"Créer mon accès":"Se connecter"),
+srv&&h("p",{className:"lfp"},nw?"Vous avez déjà un compte ?":"Pas encore de compte ?",h("button",{className:"lfs",onClick:()=>{setMd(nw?"in":"new");setEr("")}},nw?"Se connecter":"Créer un compte")),
+srv&&h(GBtn,{ok,open:()=>{setPg(true);window.scrollTo(0,0)}})))}
 function App(){
 const [u,setU]=useState(undefined),[srv,setSrv]=useState(false);
-useEffect(()=>{api("me").then(async r=>{if(r.j&&(r.j.user||r.j.err)){SRV.on=true;setSrv(true);if(r.j.user){await pull();setU(r.j.user)}else{clr();setU(null)}}else setU(LS.g("ca_user",null))}).catch(()=>setU(LS.g("ca_user",null)))},[]);
-const out=async skip=>{if(SRV.on){if(!skip)await api("auth/logout","POST",{}).catch(()=>{});SY.forEach(k=>localStorage.removeItem(k))}localStorage.removeItem("ca_user");setU(null)};
-if(u===undefined)return h("div",{style:{padding:40,textAlign:"center"}},"Chargement…");
-return u?h(Main,{user:u,logout:out}):h(Inscr,{srv,ok:x=>{if(!SRV.on)LS.s("ca_user",x);setU(x)}});}
+const [on,setOn]=useState(navigator.onLine!==false);
+useEffect(()=>{const f=()=>{setOn(true);flush()},g=()=>setOn(false);addEventListener("online",f);addEventListener("offline",g);return()=>{removeEventListener("online",f);removeEventListener("offline",g)}},[]);
+useEffect(()=>{api("me").then(async r=>{const cu=LS.g("ca_user",null);if(r.off){if(cu&&LS.g("ca_srv",false)){SRV.on=true;setSrv(true)}setU(cu)}else if(r.j&&(r.j.user||r.j.err)){SRV.on=true;setSrv(true);if(r.j.user){await pull();LS.s("ca_user",r.j.user);LS.s("ca_srv",true);setU(r.j.user);flush()}else{clr();["ca_user","ca_srv"].forEach(k=>localStorage.removeItem(k));setU(null)}}else setU(cu)})},[]);
+const out=async skip=>{if(SRV.on){if(!skip)await api("auth/logout","POST",{}).catch(()=>{});SY.forEach(k=>localStorage.removeItem(k))}["ca_user","ca_srv","ca_dirty"].forEach(k=>localStorage.removeItem(k));setU(null)};
+if(u===undefined)return h("div",{style:{padding:"70px 0"}},h(Loader));
+const bn=!on&&h("div",{role:"status",style:{position:"fixed",left:0,right:0,top:0,zIndex:9999,padding:"4px 12px",textAlign:"center",fontSize:12,background:"#12345A",color:"#fff",opacity:.94,pointerEvents:"none"}},"Hors ligne : vos écritures restent sur cet appareil et seront synchronisées au retour de la connexion.");
+return h(React.Fragment,null,u?h(Main,{user:u,logout:out}):h(Inscr,{srv,ok:x=>{LS.s("ca_user",x);if(SRV.on)LS.s("ca_srv",true);setU(x);flush()}}),bn);}
 function DataBox({logout}){
 const [m,setM]=useState("");
 const dl=(o,n)=>{try{const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([JSON.stringify(o,null,1)],{type:"application/json"}));a.download=n;a.click()}catch(e){}};
-const ex=async()=>{if(SRV.on){const r=await api("export");if(r.ok)dl(r.j,"compt-aide-donnees.json")}else dl(Object.fromEntries(SY.concat("ca_user").map(k=>[k,LS.g(k,null)])),"compt-aide-donnees.json")};
+const ex=async()=>{const loc=()=>dl(Object.fromEntries(SY.concat("ca_user").map(k=>[k,LS.g(k,null)])),"compt-aide-donnees.json");if(SRV.on){const r=await api("export");if(r.ok)dl(r.j,"compt-aide-donnees.json");else if(r.off)loc()}else loc()};
 const del=async()=>{if(!confirm("Supprimer définitivement votre compte et toutes vos écritures ?"))return;if(SRV.on){const r=await api("account","DELETE");if(!r.ok){setM("Suppression impossible.");return}}logout(true)};
 return h("div",null,h("p",{style:{marginTop:0}},"Téléchargez une copie de vos données ou supprimez votre compte."),h("div",{className:"chips",style:{marginBottom:0}},h("button",{className:"btn ghost",onClick:ex},"Exporter"),h("button",{className:"btn ghost",onClick:del},"Supprimer mon compte")),m&&h("p",{className:"sm"},m));}
 function Rap({E}){
@@ -557,6 +604,6 @@ h("div",{style:{height:12}}),h(Card,{t:"Mouvements du compte 512"},L.length?L.ma
 class EB extends React.Component{constructor(p){super(p);this.state={e:null}}static getDerivedStateFromError(e){return{e:e}}render(){if(!this.state.e)return this.props.children;return h("div",{style:{maxWidth:420,margin:"60px auto",padding:20}},h("b",{style:{fontSize:20}},"Une erreur est survenue"),h("p",null,"Touchez le bouton pour nettoyer l’ancienne version en mémoire. Vos données ne sont pas effacées."),h("button",{className:"btn",onClick:()=>window.caRepair()},"Réparer et relancer"),h("p",{className:"mu sm",style:{wordBreak:"break-word"}},String(this.state.e&&this.state.e.message||this.state.e)))}}
 document.getElementById("root").setAttribute("data-ok","1");ReactDOM.createRoot(document.getElementById("root")).render(h(EB,null,h(App)));
 </script>
-<script>if("serviceWorker" in navigator&&location.protocol==="https:")addEventListener("load",function(){navigator.serviceWorker.register("/sw.js").catch(function(){})})</script>
+<script>if("serviceWorker" in navigator&&(location.protocol==="https:"||location.hostname==="localhost"))addEventListener("load",function(){navigator.serviceWorker.register("/sw.js").catch(function(){});if(navigator.storage&&navigator.storage.persist)navigator.storage.persist().catch(function(){})})</script>
 </body>
 </html>

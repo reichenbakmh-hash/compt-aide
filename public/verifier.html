@@ -1,19 +1,39 @@
 <!DOCTYPE html>
 <html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Vérification · Compt’Aide</title>
-<style>*{box-sizing:border-box}body{margin:0;background:#F1F5F9;color:#334155;font:16px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}main{max-width:520px;margin:0 auto;padding:28px 16px}h1{font:700 26px/1.2 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;color:#12345A;margin:0 0 6px}p{margin:0 0 14px}.mu{color:#64748B;font-size:14px}.c{background:#fff;border:1px solid #E2E8F0;border-radius:12px;padding:16px;margin-top:16px}input{width:100%;min-height:46px;border:1px solid #E2E8F0;border-radius:10px;padding:8px 12px;font:inherit;background:#fff;text-transform:uppercase}button{margin-top:10px;min-height:46px;border:0;border-radius:10px;background:#12345A;color:#fff;font:600 16px system-ui;padding:0 18px;cursor:pointer}.r{display:flex;justify-content:space-between;gap:10px;padding:6px 0;border-bottom:1px solid #E7E2D4}.r:last-child{border:0}.ok{color:#0F7F6A;font-weight:700}.ko{color:#B91C1C;font-weight:700}.n{font-size:13px;color:#64748B;border-left:3px solid #12345A;padding-left:10px;margin-top:18px}</style></head>
-<body><main><h1>Vérification d’un document</h1><p class="mu">Registre en ligne des attestations et certificats délivrés par Compt’Aide.</p>
-<div class="c"><label for="n" class="mu">Numéro du document</label><input id="n" placeholder="CA-CRT-2026-XXXXXXXX" autocomplete="off"><button id="b">Vérifier</button></div>
+<style>*{box-sizing:border-box}body{margin:0;background:#F1F5F9;color:#334155;font:16px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}main{max-width:480px;margin:0 auto;padding:28px 16px}
+.brand{display:flex;align-items:center;gap:10px;margin-bottom:18px}.brand svg{flex:none}.wm{font-size:26px;font-weight:800;color:#12345A;letter-spacing:-.5px}.wm b{color:#0F7F6A}
+h1{font-size:24px;line-height:1.2;color:#12345A;margin:0 0 6px}p{margin:0 0 14px}.mu{color:#64748B;font-size:14px}
+.c{background:#fff;border-radius:16px;box-shadow:0 2px 12px rgba(0,0,0,.08);padding:20px;margin-top:16px}
+label{display:block;font-weight:600;color:#12345A;margin:0 0 6px}input{width:100%;height:50px;border:1.5px solid #E2E8F0;border-radius:10px;padding:0 12px;font:inherit;background:#fff;text-transform:uppercase;margin-bottom:12px}input:focus{outline:0;border-color:#20B89A}
+button{width:100%;height:50px;border:0;border-radius:10px;background:#12345A;color:#fff;font:600 16px system-ui;cursor:pointer}
+.r{display:flex;justify-content:space-between;gap:12px;padding:9px 0;border-bottom:1px solid #E2E8F0}.r:last-child{border:0}.r b{text-align:right;color:#12345A}
+.ok{color:#0F7F6A!important}.ko{color:#B91C1C!important}.big{font-size:19px}
+.ldr{display:flex;justify-content:center;padding:24px 0 6px}.cupl{width:100px;height:80px;position:relative;display:flex;align-items:center}
+.cup{position:absolute;width:25px;height:18px;background:#fff;border:1px solid #12345A;z-index:1;border-radius:2px 2px 10px 10px;animation:cupx 6s infinite ease-in-out}
+.cup::after{content:"";position:absolute;top:-2px;width:calc(100% - 2px);height:2px;background:#fed59fca;border:1px solid #12345A;border-radius:50%}
+.cup::before{content:"";position:absolute;top:15px;width:calc(100% - 2px);height:4px;border:1px solid #12345A;border-top:none;border-radius:50%;z-index:-1}
+.cup-handle{position:absolute;width:5px;height:10px;background:#fff;border:1px solid #12345A;right:-5px;top:2px;border-radius:2px 10px 20px 2px}
+.smoke{position:absolute;bottom:100%;left:50%;width:15px;height:25px;background:rgba(107,102,102,.433);border-radius:50%;transform:translateX(-50%);animation:cupr 6s infinite ease-in-out;filter:blur(8px)}.smoke.two{animation-delay:1s}.smoke.three{animation-delay:2s}
+.load{position:absolute;font-size:10px;opacity:.7;top:45%;left:50%;transform:translateX(-50%);z-index:-1}
+@keyframes cupx{0%{width:25px;transform:translateX(0)}40%{width:100%;transform:translateX(0)}80%{width:25px;transform:translateX(64px)}90%{width:100%;transform:translateX(0)}100%{width:25px;transform:translateX(0)}}
+@keyframes cupr{0%{transform:translate(-50%,0) scale(.4);opacity:0}30%{opacity:.7}60%{opacity:.4}100%{transform:translate(-50%,-120px) scale(1);opacity:0}}
+.n{font-size:13px;color:#64748B;margin-top:18px}</style></head>
+<body><main>
+<div class="brand"><svg width="40" height="40" viewBox="0 0 40 40" aria-hidden="true"><rect width="40" height="40" rx="10" fill="#12345A" stroke="#2B4F7C"/><rect x="9" y="7" width="18" height="24" rx="3" fill="none" stroke="#fff" stroke-width="2"/><path d="M13 14h10M13 19h6" stroke="#fff" stroke-width="2" stroke-linecap="round" opacity=".7"/><circle cx="27" cy="29" r="8" fill="#20B89A" stroke="#12345A" stroke-width="2"/><path d="M23.5 29l2.6 2.6 4.6-5.2" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg><span class="wm">Compt’<b>Aide</b></span></div>
+<h1>Vérifier un document</h1><p class="mu">Saisissez le numéro et le code de vérification imprimés sous le QR code.</p>
+<div class="c"><label for="n">Numéro du document</label><input id="n" placeholder="CA-2026-000124" autocomplete="off"><label for="k">Code de vérification</label><input id="k" placeholder="XXXX-XXXX" autocomplete="off"><button id="b">Vérifier</button></div>
 <div class="c" id="o" hidden></div>
-<p class="n">Seuls le numéro, le type, le prénom et l’initiale du nom, la date et le statut sont publics (plus la note finale d’un certificat).</p></main>
+<p class="n">Comparez toujours les informations affichées ici avec celles du document : nom, parcours et date. Le QR code seul ne prouve rien, c’est ce registre qui fait foi.</p></main>
 <script>
-var n=document.getElementById("n"),o=document.getElementById("o");
+var n=document.getElementById("n"),k=document.getElementById("k"),o=document.getElementById("o");
 function row(a,b,c){return '<div class="r"><span>'+a+'</span><b'+(c?' class="'+c+'"':'')+'>'+b+'</b></div>'}
 function esc(t){return String(t).replace(/[&<>"]/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]})}
-function go(){var v=n.value.trim().toUpperCase();if(!v)return;o.hidden=false;o.textContent="Vérification…";
-fetch("/api/verify/"+encodeURIComponent(v)).then(function(r){return r.json()}).then(function(j){
-if(!j.ok){o.innerHTML=row("Résultat","Introuvable","ko")+'<p class="mu" style="margin:10px 0 0">'+esc(j.err||"")+'</p>';return}
+var LD='<div class="ldr"><div class="cupl"><div class="cup"><div class="cup-handle"></div><div class="smoke one"></div><div class="smoke two"></div><div class="smoke three"></div></div><div class="load">..........................</div></div></div>';
+function go(){var v=n.value.trim().toUpperCase();if(!v)return;o.hidden=false;o.innerHTML=LD;
+fetch("/api/verify/"+encodeURIComponent(v)+"?c="+encodeURIComponent(k.value.trim())).then(function(r){return r.json()}).then(function(j){
+if(!j.ok){o.innerHTML=row("Résultat","Non vérifié","ko big")+'<p class="mu" style="margin:10px 0 0">'+esc(j.err||"")+'</p>';return}
 var ok=j.statut==="valide";
-o.innerHTML=row("Résultat",ok?"Document authentique":"Document révoqué",ok?"ok":"ko")+row("Numéro",esc(j.num))+row("Type",j.type==="ATT"?"Attestation de parcours":"Certificat de réussite")+row("Titulaire",esc(j.titulaire))+row("Délivré le",new Date(j.issued).toLocaleDateString("fr-FR"))+(j.final!=null?row("Note finale",j.final+" / 100"):"")}).catch(function(){o.textContent="Service momentanément indisponible."})}
-document.getElementById("b").onclick=go;n.onkeydown=function(e){if(e.key==="Enter")go()};
-var q=new URLSearchParams(location.search).get("n");if(q){n.value=q;go()}
+o.innerHTML=row("Résultat",ok?"Document authentique":"Document révoqué",(ok?"ok":"ko")+" big")+row("Document",j.type==="ATT"?"Attestation de formation":"Certificat de réussite")+row("Numéro",esc(j.num))+row("Bénéficiaire",esc(j.titulaire))+row("Formation",esc(j.parcours||""))+row("Délivré le",new Date(j.issued).toLocaleDateString("fr-FR",{day:"numeric",month:"long",year:"numeric"}))+row("Statut",ok?"Valide":"Révoqué",ok?"ok":"ko")}).catch(function(){o.innerHTML='<p class="mu" style="margin:0">Service momentanément indisponible.</p>'})}
+document.getElementById("b").onclick=go;n.onkeydown=k.onkeydown=function(e){if(e.key==="Enter")go()};
+var q=new URLSearchParams(location.search);if(q.get("n")){n.value=q.get("n");k.value=q.get("c")||"";go()}
 </script></body></html>

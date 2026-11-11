@@ -14,7 +14,7 @@ export async function onRequest(c){
 const u=new URL(c.request.url),p=u.pathname.replace(/^\/api\/?/,"").replace(/\/$/,""),m=c.request.method,db=c.env.DB;
 if(!db)return J({err:"Le service est momentanément indisponible. Réessayez dans quelques instants."},503);
 if(p==="config"&&m==="GET")return J({google:c.env.GOOGLE_CLIENT_ID||null});
-if(p.startsWith("verify/")&&m==="GET")return verify(c,decodeURIComponent(p.slice(7)).toUpperCase());
+if(p.startsWith("verify/")&&m==="GET")return verify(c,decodeURIComponent(p.slice(7)).toUpperCase(),new URL(c.request.url).searchParams.get("c"));
 const o=c.request.headers.get("origin");
 if(m!=="GET"&&o&&new URL(o).host!==u.host)return J({err:"Requête refusée."},403);
 try{
