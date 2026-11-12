@@ -6,13 +6,13 @@
 <link rel="manifest" href="/manifest.webmanifest"><link rel="icon" href="/icon.svg" type="image/svg+xml"><meta name="theme-color" content="#FFFFFF">
 <title>Compt’Aide</title>
 <script>addEventListener("beforeinstallprompt",function(e){e.preventDefault();window.__ip=e;dispatchEvent(new Event("ip"))});addEventListener("appinstalled",function(){window.__ip=null;dispatchEvent(new Event("ip"))})</script>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;500;600;700;800&family=Source+Serif+4:wght@600;700&display=swap">
 <style>
 *{box-sizing:border-box}
 :root{--bg:#F1F5F9;--card:#fff;--hd:#12345A;--tx:#334155;--mu:#64748B;--bd:#E2E8F0;--ac:#20B89A;--acs:#E3F6F2;--acx:#0F7F6A;--bt:#12345A;--btx:#fff;--wn:#B45309;--wns:#FEF3C7;--er:#B91C1C;--ers:#FEE2E2;--hov:#E8EEF4;color-scheme:light;padding-top:env(safe-area-inset-top,0px)}
 :root[data-theme="dark"]{--bg:#0B1727;--card:#12263F;--hd:#F1F5F9;--tx:#CBD5E1;--mu:#94A3B8;--bd:#25405F;--acs:#0F3A3F;--acx:#4FD6BB;--bt:#20B89A;--btx:#0B1727;--wn:#FBBF24;--wns:#3B2F10;--er:#FCA5A5;--ers:#442026;--hov:#16304F;color-scheme:dark}
 html{scroll-padding-top:env(safe-area-inset-top,0px)}
-body{margin:0;background:var(--bg);color:var(--tx);font:15px/1.5 Inter,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--tx);font:16px/1.5 "Source Sans 3",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;-webkit-text-size-adjust:100%}
 button,input{font:inherit;color:inherit}
 .app{display:flex;min-height:100vh}
 aside{display:none}
@@ -184,6 +184,18 @@ main{max-width:780px;padding:20px 16px 40px}
 .lfp{text-align:center;font-size:14px;margin:6px 0;color:var(--tx)}
 .lfs{color:var(--acx);font:inherit;font-weight:600;cursor:pointer;background:none;border:0;padding:0 4px}
 .lfd{display:flex;align-items:center;gap:10px;color:var(--mu);font-size:14px;margin:10px 0}.lfd::before,.lfd::after{content:"";flex:1;height:1px;background:var(--bd)}
+/* identité */
+h1,.mhead h1,.dwel h2{font-family:"Source Serif 4",Georgia,serif;font-weight:600;letter-spacing:-.01em}
+.kv{font-family:"Source Serif 4",Georgia,serif;font-weight:600}
+.card{box-shadow:none;border-radius:8px}
+.btn{border-radius:6px}
+.hi,.hl{border-left:0;border-radius:4px}
+.kl{padding:2px 16px}
+.klr{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:11px 0;border-bottom:1px solid var(--bd)}
+.klr:last-child{border-bottom:0}
+.klr .kv{margin:0;font-size:19px;white-space:nowrap}
+.klr b{color:var(--hd);font-weight:600}
+.tip{margin:14px 2px 0}
 @media print{aside,.bnav,.sheet,.top,.fbtop,.chips{display:none!important}main{padding:0;max-width:none}}
 </style>
 </head>
@@ -239,6 +251,7 @@ const KB=[[["401","fournisseur"],"Le compte 401 enregistre les dettes envers les
 const Head=({t,s})=>h("div",null,h("h1",null,t),s?h("p",{className:"sub"},s):null);
 const Card=({t,children})=>h("section",{className:"card"},t&&h("h2",null,t),children);
 const Kpi=({l,v,s,tone})=>h("div",{className:"card"},h("div",{className:"mu sm"},l),h("div",{className:"kv "+(tone||"")},v),h("div",{className:"mu sm"},s));
+const Kl=({l,v,s,tone})=>h("div",{className:"klr"},h("div",null,h("b",null,l),h("div",{className:"mu sm"},s)),h("div",{className:"kv "+(tone||"")},v));
 const Badge=({s})=>h("span",{className:"badge "+BC[s]},s);
 const Prog=({l,v})=>h("div",{className:"pg"},h("div",{className:"row"},h("span",null,l),h("b",null,Math.round(v)+" %")),h("div",{className:"bar"},h("i",{style:{width:v+"%"}})));
 const Chips=({o,v,set})=>h("div",{className:"chips"},o.map(x=>h("button",{key:x[0],className:"chip"+(v===x[0]?" on":""),onClick:()=>set(x[0])},x[1])));
@@ -279,7 +292,7 @@ function Pcg(){
 const [q,setQ]=useState(""),[c,setC]=useState("all"),[f,setF]=useState(false),[sy,setSy]=useState("all"),[o,setO]=useState(null),[nv,setNv]=useState(false),[lim,setLim]=useState(150);
 const L=PCGD.filter(x=>(c==="all"||x[0][0]===c)&&(!f||STAR.has(x[0]))&&(sy==="all"||(sy==="fac"?x[2]:!x[2]))&&norm(x[0]+" "+x[1]).includes(norm(q)));
 const cap=q||c!=="all"||f?2000:lim;
-return h("div",null,h(Head,{t:"Plan comptable général",s:PCGD.length+" comptes · PCG au 1er janvier 2026 · "+STAR.size+" essentiels surlignés"}),
+return h("div",null,h(Head,{t:"Plan comptable général",s:PCGD.length+" comptes, PCG au 1er janvier 2026. "+STAR.size+" essentiels surlignés."}),
 h(Card,{t:"Comment lire un numéro de compte"},h("p",{style:{margin:0}},"Le premier chiffre donne la classe (4 = tiers, 5 = trésorerie, 6 = charges, 7 = produits) ; chaque chiffre ajouté précise le compte. Les classes 1 à 5 forment le bilan, les classes 6 et 7 le compte de résultat. Les comptes en italique sont facultatifs : le système minimal suffit pour une petite entité. Touche un compte pour lire son explication."),h("p",{className:"mu sm",style:{marginBottom:0}},"Source : plan comptable général publié par l’ANC, version 2026.")),
 h("div",{style:{height:12}}),
 h("input",{className:"inp",placeholder:"Numéro ou nom de compte…",value:q,onChange:e=>setQ(e.target.value),"aria-label":"Rechercher un compte"}),
@@ -328,7 +341,7 @@ const LES=[
 {t:"15. Écritures courantes à connaître",p:["Avoir reçu d’un fournisseur : on inverse la facture d’origine.","Règlement client : débit 512, crédit 411. Frais bancaires : débit 627, crédit 512, sans TVA.","Acompte versé à un fournisseur : compte 4091. Acompte reçu d’un client : compte 4191.","Apport en capital : débit 512, crédit 101."],l:[["401","Fournisseurs",120,0],["607","Achats de marchandises",0,100],["44566","TVA déductible",0,20]],n:"Avoir de 100 € HT reçu d’un fournisseur, TVA 20 %."}];
 function Lessons(){
 const [o,setO]=useState(0);
-return h("div",null,h(Head,{t:"Leçons de comptabilité",s:"Les notions de base du métier"}),LES.map((x,i)=>h("section",{className:"card pc",key:i},h("button",{className:"btn ghost",style:{width:"100%",textAlign:"left"},onClick:()=>setO(o===i?-1:i)},x.t),o===i&&h("div",{style:{marginTop:12}},x.p.map((t,j)=>h("p",{key:j,style:{margin:"0 0 8px"}},t)),x.l&&h("div",null,h("div",{className:"mu sm",style:{marginBottom:6}},x.n),h(Lines,{l:x.l}))))));}
+return h("div",null,h(Head,{t:"Leçons de comptabilité",s:""}),LES.map((x,i)=>h("section",{className:"card pc",key:i},h("button",{className:"btn ghost",style:{width:"100%",textAlign:"left"},onClick:()=>setO(o===i?-1:i)},x.t),o===i&&h("div",{style:{marginTop:12}},x.p.map((t,j)=>h("p",{key:j,style:{margin:"0 0 8px"}},t)),x.l&&h("div",null,h("div",{className:"mu sm",style:{marginBottom:6}},x.n),h(Lines,{l:x.l}))))));}
 const QZ=[["607 Achats de marchandises : on achète","D","Une charge augmente au débit."],["411 Clients : on vend à crédit","D","Le client nous doit de l’argent : créance à l’actif, au débit."],["706 Prestations de services : on facture","C","Un produit augmente au crédit."],["401 Fournisseurs : on reçoit la facture d’achat","C","On doit de l’argent : dette au passif, au crédit."],["512 Banque : on encaisse un règlement client","D","La trésorerie augmente : actif, au débit."],["44566 TVA déductible : achat avec TVA","D","Créance sur l’État : au débit."],["44571 TVA collectée : vente avec TVA","C","Dette envers l’État : au crédit."],["101 Capital : les associés apportent des fonds","C","Capitaux propres au passif : au crédit."],["2183 Matériel informatique : on achète un ordinateur","D","Une immobilisation est un actif : au débit."],["281 Amortissements : on constate l’usure du matériel","C","Le cumul d’amortissements diminue la valeur de l’actif : il se crédite."],["681 Dotations aux amortissements","D","C’est une charge : au débit."],["641 Rémunérations du personnel : on enregistre les salaires bruts","D","Charge de personnel : au débit."],["421 Personnel : on constate le salaire net dû","C","C’est une dette envers le salarié : au crédit."],["512 Banque : on paie un fournisseur","C","La trésorerie diminue : au crédit."]];
 function Quiz(){
 const [i,setI]=useState(0),[sc,setSc]=useState(0),[a,setA]=useState(null),q=QZ[i];
@@ -340,7 +353,7 @@ const [t,setT]=useState("l");
 return h("div",null,h(Chips,{o:[["l","Leçons"],["q","Entraînement"],["a","Atelier de saisie"],["j","Journal d’exemple"],["g","Glossaire"],["m","Métier"]],v:t,set:setT}),t==="l"?h(Lessons):t==="q"?h(Quiz):t==="a"?h(Atelier):t==="g"?h(Glo):t==="m"?h(Metier):h(Journal));}
 const IMP=[["","TVA","Impôt sur la consommation : l’entreprise le collecte pour l’État. Taux normal 20 %, taux réduits 10 %, 5,5 % et 2,1 %. Trois régimes : franchise en base, réel simplifié, réel normal.","Comptes : 44571, 44566, 44551"],["","Impôt sur les sociétés (IS)","Impôt sur le bénéfice des sociétés. Taux normal 25 %, taux réduit de 15 % jusqu’à 42 500 € de bénéfice sous conditions. Payé par acomptes, puis solde.","Comptes : 695, 444"],["","Impôt sur le revenu (IR)","Payé par les particuliers, et par les entrepreneurs individuels dont le bénéfice est imposé à leur nom (BIC, BNC, BA). Barème progressif par tranches, revu chaque année.","Compte : 108"],["","CFE","Cotisation foncière des entreprises : impôt local dû pour exercer une activité. C’est une charge déductible.","Compte : 635"]];
 function FiscCours(){
-return h("div",null,h(Head,{t:"Les impôts de l’entreprise",s:"Les impôts à connaître pour tenir la comptabilité"}),IMP.map(x=>h("section",{className:"card pc",key:x[1]},h("h2",null,x[1]),h("p",{style:{margin:"0 0 6px"}},x[2]),h("span",{className:"badge ok"},x[3]))),h(Card,null,h("p",{className:"mu sm",style:{margin:0}},"Les taux, seuils et dates changent régulièrement : vérifie toujours sur impots.gouv.fr et le BOFiP. Les exemples sont simplifiés pour apprendre.")));}
+return h("div",null,h(Head,{t:"Les impôts de l’entreprise",s:""}),IMP.map(x=>h("section",{className:"card pc",key:x[1]},h("h2",null,x[1]),h("p",{style:{margin:"0 0 6px"}},x[2]),h("span",{className:"badge ok"},x[3]))),h(Card,null,h("p",{className:"mu sm",style:{margin:0}},"Les taux, seuils et dates changent régulièrement : vérifie toujours sur impots.gouv.fr et le BOFiP. Les exemples sont simplifiés pour apprendre.")));}
 const TS=[{e:"",t:"Le meunier vend la farine",x:"Il facture 100 € HT + 20 € de TVA = 120 € TTC. Il n’a rien acheté : il reverse les 20 € à l’État.",g:20},{e:"",t:"Le boulanger achète la farine",x:"Il paie 120 € TTC. Les 20 € de TVA ne sont pas une charge : il les récupère (TVA déductible).",l:[["607","Achats de marchandises",100,0],["44566","TVA déductible",20,0],["401","Fournisseurs",0,120]],g:20},{e:"",t:"Le boulanger vend son pain",x:"Il encaisse 360 € TTC (300 € HT + 60 € de TVA). Ces 60 € appartiennent à l’État : c’est la TVA collectée.",l:[["411","Clients",360,0],["707","Ventes de marchandises",0,300],["44571","TVA collectée",0,60]],g:20},{e:"",t:"La déclaration de TVA",x:"TVA à payer = collectée − déductible = 60 − 20 = 40 €. L’État a reçu 20 + 40 = 60 € au total.",l:[["44571","TVA collectée",60,0],["44566","TVA déductible",0,20],["44551","TVA à décaisser",0,40]],g:60},{e:"",t:"Le client final paie",x:"Il paie 360 € dont 60 € de TVA, sans pouvoir rien récupérer. La TVA pèse sur le consommateur : les entreprises ne font que la collecter.",g:60}];
 function Tva(){
 const [s,setS]=useState(0),x=TS[s];
@@ -360,7 +373,7 @@ const fm=x=>x.split(/(\*\*[^*]+\*\*|`[^`]+`)/).map((p,i)=>p.startsWith("**")&&p.
 return h("div",{className:"dc"},
 h("div",{className:"dch"},h("span",{className:"hash"},"#"),h("b",null,"compt-ai"),m.length>0&&h("button",{className:"lk sm",style:{fontWeight:400},onClick:()=>{setM([]);LS.s("ca_ia",[])}},"Effacer")),
 h("div",{className:"dms",id:"dms"},
-m.length===0&&h("div",{className:"dwel"},h("div",{className:"dwi"},"#"),h("h2",null,"Bienvenue dans #compt-ai"),h("p",{className:"mu"},"Posez vos questions de comptabilité, de fiscalité ou d’Excel."),h("div",{className:"chips"},S.map(x=>h("button",{key:x,className:"chip",onClick:()=>ask(x)},x)))),
+m.length===0&&h("div",{className:"dwel"},h("div",{className:"dwi"},"#"),h("h2",null,"#compt-ai"),h("p",{className:"mu"},"Comptabilité, fiscalité, Excel : posez votre question."),h("div",{className:"chips"},S.map(x=>h("button",{key:x,className:"chip",onClick:()=>ask(x)},x)))),
 m.map((x,i)=>{const p=m[i-1],g=p&&p.r===x.r&&x.at&&p.at&&x.at-p.at<3e5;return h("div",{key:i,className:"dm"+(g?" g":"")},g?h("div",{className:"dav sp"}):h("div",{className:"dav "+x.r},x.r==="u"?ini:h(Icon,{n:"bot",s:22})),h("div",{className:"dbd"},!g&&h("div",{className:"dnm"},h("b",{className:x.r},x.r==="u"?nom:"Compt’AI"),x.r==="b"&&h("span",{className:"dbot"},"BOT"),h("span",{className:"dts"},hm(x.at))),h("div",{className:"dtx"},fm(x.t))))}),
 bz&&h("div",{className:"dm"},h("div",{className:"dav b"},h(Icon,{n:"bot",s:22})),h("div",{className:"dbd"},h("div",{className:"dnm"},h("b",{className:"b"},"Compt’AI"),h("span",{className:"dbot"},"BOT")),h("div",{className:"dty"},h("i"),h("i"),h("i"))))),
 h("div",{className:"dcp"},h("div",{className:"dcb"},h("input",{className:"dci",placeholder:"Envoyer un message dans #compt-ai",value:t,onChange:e=>setT(e.target.value),onKeyDown:e=>e.key==="Enter"&&ask(t),"aria-label":"Message"}),h("button",{className:"dsd",disabled:bz||!t.trim(),onClick:()=>ask(t),"aria-label":"Envoyer"},h(Icon,{n:"send",s:20})))))}
@@ -497,15 +510,13 @@ let Pr=0,Ch=0,C3=0,C4=0,nx=null;
 E.forEach(e=>e.l.forEach(x=>{const c=x[0];if(c[0]==="7")Pr+=x[2]-x[1];if(c[0]==="6")Ch+=x[1]-x[2];if(c==="44571")C3+=x[2]-x[1];if(c==="44566")C4+=x[1]-x[2]}));
 PAR.some((st,i)=>st.s.some((q,j)=>{if(!P[i+"-"+j]){nx=q;return true}}));
 const xl=LS.g("ca_xl",{}),xd=XL_LES.filter(x=>xl.l&&xl.l[x.id]).length,tip=TIPS[Math.floor(Date.now()/864e5)%TIPS.length];
-return h("div",null,h(Head,{t:"Bonjour"+(user&&user.nom?" "+user.nom:""),s:"Votre espace de travail · "+entity}),h(Inst),
-h("div",{className:"grid kpis"},h(Kpi,{l:"Écritures",v:String(E.length),s:"Atelier pratique"}),h(Kpi,{l:"Résultat",v:eur(r2(Pr-Ch)),s:"Produits moins charges"}),h(Kpi,{l:"TVA à payer",v:eur(r2(C3-C4)),s:"Collectée moins déductible"}),h(Kpi,{l:"Parcours",v:Math.round(ok/tot*100)+" %",s:ok+" étapes sur "+tot}),h(Kpi,{l:"Cas réussis",v:done.length+" / "+CAS.length,s:"Cas professionnels"}),h(Kpi,{l:"Excel",v:xd+" / "+XL_LES.length,s:"Leçons réussies"})),
+return h("div",null,h(Head,{t:"Bonjour"+(user&&user.nom?" "+user.nom:""),s:entity}),h(Inst),
+h("section",{className:"card kl"},h(Kl,{l:"Écritures",v:String(E.length),s:"Atelier pratique"}),h(Kl,{l:"Résultat",v:eur(r2(Pr-Ch)),s:"Produits moins charges"}),h(Kl,{l:"TVA à payer",v:eur(r2(C3-C4)),s:"Collectée moins déductible"}),h(Kl,{l:"Parcours",v:Math.round(ok/tot*100)+" %",s:ok+" étapes sur "+tot}),h(Kl,{l:"Cas réussis",v:done.length+" / "+CAS.length,s:"Cas professionnels"}),h(Kl,{l:"Excel",v:xd+" / "+XL_LES.length,s:"Leçons réussies"})),
 h("div",{className:"grid two"},h(Card,{t:"Prochaine étape"},nx?h("div",null,h("p",{style:{marginTop:0}},nx[0]),h("button",{className:"btn",onClick:()=>go(nx[1])},"Ouvrir"),h("button",{className:"btn ghost",style:{marginLeft:8},onClick:()=>go("par")},"Voir le parcours")):h("p",{style:{margin:0}},"Parcours terminé. Passez l’évaluation finale pour obtenir votre certificat.")),
 h(Card,{t:"Progression par niveau"},PAR.map((st,i)=>h(Prog,{key:i,l:st.t,v:st.s.filter((q,j)=>P[i+"-"+j]).length/st.s.length*100})))),
 h("div",{className:"grid two"},h(Card,{t:"Apprendre Excel"},h(Prog,{l:"Leçons réussies",v:xd/XL_LES.length*100}),h("button",{className:"btn",onClick:()=>go("xl")},"Continuer")),
 h(Card,{t:"Certification"},h(Prog,{l:"Formation validée",v:ok/tot*100}),h("button",{className:"btn",onClick:()=>go("cert")},"Ouvrir"))),
-h(Card,{t:"Astuce du jour"},h("p",{style:{margin:0}},tip)),
-h("div",{style:{height:12}}),
-h(Card,{t:"Accès rapide"},h("div",{className:"chips",style:{marginBottom:0}},[["pro","Atelier pratique"],["compta","Leçons"],["pcg","Plan comptable"],["cas","Cas professionnels"],["xl","Excel"],["cert","Certification"],["jar","Jargon"],["ia","Compt’AI"]].map(x=>h("button",{key:x[0],className:"chip",onClick:()=>go(x[0])},x[1])))))}
+h("p",{className:"mu tip"},"À savoir : "+tip))}
 const WA="https://wa.me/261378903367?text="+encodeURIComponent("Bonjour, je vous contacte au sujet de Compt’Aide.");
 const POL=[["En deux mots","Vos données restent à vous. Personne d’autre ne peut voir ce que vous faites dans l’application. Nous ne vendons rien et il n’y a pas de publicité."],["Ce que nous gardons","Votre prénom, votre e-mail et votre mot de passe (il est brouillé : même nous ne pouvons pas le lire). Votre travail : écritures, progression, résultats. Vos questions à Compt’AI et ses réponses. Votre date d’inscription et les jours où vous avez utilisé l’application (sans le détail de ce que vous y faites). Vos avis, si vous répondez au court questionnaire de satisfaction."],["Pourquoi","Pour que vous retrouviez votre travail sur n’importe quel téléphone, et pour vous répondre si vous nous écrivez."],["Qui peut voir quoi","Vous seul voyez vos écritures et vos discussions. Les autres utilisateurs ne voient rien. Sur un téléphone prêté, pensez à vous déconnecter."],["Compt’AI","Votre question est envoyée à un service d’intelligence artificielle pour obtenir la réponse. Nous ne l’utilisons pour rien d’autre. Compt’AI peut se tromper : vérifiez avant d’utiliser une réponse dans la vraie vie."],["Vos certificats","Une attestation ou un certificat porte votre nom et un numéro. Avec ce numéro, n’importe qui peut vérifier sur notre site que le document est vrai. Cette personne voit seulement : le numéro, votre prénom et l’initiale de votre nom, la date, et la note finale du certificat. Rien d’autre."],["Vos avis et statistiques","Après l’attestation ou une évaluation, nous pouvons vous proposer un court questionnaire : trois notes, une note de recommandation et un commentaire facultatif. Vous pouvez l’ignorer. Votre avis est rattaché à votre compte, mais il n’est jamais montré avec votre nom. Le responsable de l’application voit des statistiques globales (nombre d’inscrits, progression moyenne, résultats, moyennes des avis) et les commentaires sans identité. Pour gérer les certificats, il voit aussi la liste des documents délivrés."],["Connexion avec Google","Si vous choisissez Google, nous recevons seulement votre prénom et votre adresse e-mail. Jamais votre mot de passe Google, ni vos messages."],["Un seul petit fichier","Il sert à vous garder connecté. Pas de publicité, pas de suivi."],["Où sont vos données","Chez Cloudflare, une entreprise d’hébergement. Ses ordinateurs peuvent se trouver hors d’Europe."],["Combien de temps","Tant que votre compte existe. Si vous le supprimez, tout est effacé, y compris vos certificats et vos avis."],["Vos choix","À tout moment, vous pouvez télécharger vos données ou supprimer votre compte : Paramètres, puis Mes données. Pour toute autre demande, écrivez-nous sur WhatsApp. Vous pouvez aussi contacter la CNIL (cnil.fr)."],["Dernière mise à jour","Novembre 2026."]];
 const Pol=()=>h("div",null,POL.map((x,i)=>h("div",{key:x[0],style:{marginBottom:12}},h("b",{style:{color:"var(--hd)"}},x[0]),h("div",{style:{marginTop:2,fontSize:15}},x[1]))));
